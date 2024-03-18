@@ -1,0 +1,98 @@
+# Copyright (c) Meta Platforms, Inc. and affiliates.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
+load(
+    "@prelude//erlang:erlang_toolchain.bzl",
+    "config_erlang_toolchain_rule",
+    "get_primary_tools",
+    "multi_version_toolchain_rule",
+    _toolchain_resources="toolchain_resources",
+)
+
+system_genrule_toolchain(
+    name="genrule",
+    visibility=["PUBLIC"],
+)
+
+erlang_otp_binaries(
+    name="local",
+    erl="local/erl",
+    erlc="local/erlc",
+    escript="local/escript",
+    visibility=["PUBLIC"],
+)
+
+
+config_erlang_toolchain_rule(
+    name="erlang-local",
+    otp_binaries=":local",
+    visibility=["PUBLIC"],
+    erl_opts="+nowarn_underscore_match +debug_info +warnings_as_errors -DA_MACRO",
+    emu_flags="+sbwt very_short +sbwtdcpu very_short +sbwtdio very_short",
+    parse_transforms_filters={},
+    parse_transforms=[],
+)
+
+config_erlang_toolchain_rule(
+    name="erlang-taint",
+    otp_binaries=":local",
+    visibility=["PUBLIC"],
+    erl_opts="+nowarn_underscore_match +debug_info +warnings_as_errors -DA_MACRO +{finer_taint_module,parallel_finer_taint} +{finer_taint_do_checks,false} +{finer_taint_sinks,true}",
+    emu_flags="+sbwt very_short +sbwtdcpu very_short +sbwtdio very_short",
+    parse_transforms_filters={},
+    parse_transforms=["root//:finer_taint_compiler"],
+)
+
+config_erlang_toolchain_rule(
+    name="erlang-online-taint",
+    otp_binaries=":local",
+    visibility=["PUBLIC"],
+    erl_opts="+nowarn_underscore_match +debug_info +warnings_as_errors -DA_MACRO +{finer_taint_module,online_finer_taint} +{finer_taint_do_checks,false} +{finer_taint_sinks,true}",
+    emu_flags="+sbwt very_short +sbwtdcpu very_short +sbwtdio very_short",
+    parse_transforms_filters={},
+    parse_transforms=["root//:finer_taint_compiler"],
+)
+
+constraint_setting(name="taint_mode")
+
+constraint_value(name="off", constraint_setting=":taint_mode")
+constraint_value(name="finer_taint", constraint_setting=":taint_mode")
+constraint_value(name="online_finer_taint", constraint_setting=":taint_mode")
+
+config_setting(name="online-finer-taint-set", constraint_values=[":online_finer_taint"])
+config_setting(name="finer-taint-set", constraint_values=[":finer_taint"])
+config_setting(name="notaint-set", constraint_values=[":off"])
+
+platform(name="default", constraint_values=[":no"])
+platform(name="finer-taint-mode", constraint_values=[":finer_taint"])
+platform(name="online-finer-taint-mode", constraint_values=[":online_finer_taint"])
+
+multi_version_toolchain_rule(
+    name="erlang-default",
+    targets=select(
+        {
+            ":notaint-set": [":erlang-local", ":erlang-taint"],
+            ":finer-taint-set": [":erlang-taint"],
+            ":online-finer-taint-set": [":erlang-online-taint"],
+            "DEFAULT": [":erlang-local"],
+        }
+    ),
+    visibility=["PUBLIC"],
+)
+_toolchain_resources(
+    name="erlang-resources",
+    jsone="root//third-party:jsone",
+    visibility=["PUBLIC"],
+)

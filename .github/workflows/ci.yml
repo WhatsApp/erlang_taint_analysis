@@ -1,0 +1,37 @@
+name: CI
+on:
+  push:
+    branches:
+      - '*'
+  pull_request:
+    branches:
+      - main
+jobs:
+  build:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            otp-version: 26
+    runs-on: ${{ matrix.os }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          submodules: 'true'
+      - uses: erlef/setup-beam@v1
+        with:
+          otp-version: ${{matrix.otp-version}}
+      - uses: dtolnay/install-buck2@latest
+        with:
+          prelude-submodule: prelude
+      - name: Build
+        run: buck2 build //...
+      - name: Test
+        run: buck2 test //...
+      - name: Run simple example
+        run: buck2 run @//mode/online_finer_taint :examples simple
+      - name: Run gen_server example
+        run: buck2 run @//mode/online_finer_taint :examples a_string
+

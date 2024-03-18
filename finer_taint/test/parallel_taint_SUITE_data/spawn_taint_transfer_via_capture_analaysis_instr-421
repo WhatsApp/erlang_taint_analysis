@@ -1,0 +1,16 @@
+{push,{"@generated"}}.
+{pop,{}}.
+{push_scope,{{taint_spawn,lambda_taint_spawn_53_16_anon,0},
+             "taint_spawn.erl:53"}}.
+{receive_trace,{421,"instrumentation"}}.
+{deconstruct_pattern,{{tuple,2},"taint_spawn.erl:53"}}.
+{restore_capture,{{taint_spawn,lambda_taint_spawn_53_16_anon,0},
+                  "taint_spawn.erl:53"}}.
+{pop,{}}.
+{get,{"TaintedVal","taint_spawn.erl:54"}}.
+{sink,{"taint_spawn.erl:54"}}.
+{pop,{}}.
+{get,{"Parent","taint_spawn.erl:55"}}.
+{push,{notaint}}.
+{send,{"#Ref<0.1321034574.60293123.64552>","taint_spawn.erl:55"}}.
+{func_ret,{lambda_taint_spawn_53_16_anon,"taint_spawn.erl:53"}}.
