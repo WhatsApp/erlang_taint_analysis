@@ -16,6 +16,7 @@ load(
     "@prelude//erlang:erlang_toolchain.bzl",
     "erlang_parse_transform",
 )
+# @fb-only
 
 export_file(name = "taint_models", src = "finer_taint/priv/models.cfg")
 
