@@ -13,6 +13,7 @@
 % limitations under the License.
 
 -module(example_gen_server).
+-compile(warn_missing_spec_all).
 -behaviour(gen_server).
 
 -export([
@@ -29,14 +30,19 @@
     handle_cast/2
 ]).
 
+-type state() :: [term()].
 
+-spec id_function(X) -> X.
 id_function(X) -> X.
+
+-spec other_id_function(X) -> X.
 other_id_function(X) -> X.
 
+-spec gen_server_main(term()) -> ok.
 gen_server_main(String) ->
   io:format("Started ~p ~n", [ok]),
   {ok, Pid} = example_gen_server:start_link(),
-  try 
+  try
     TaintedVal = finer_taint:source(String),
     finer_taint:sink(TaintedVal),
     finer_taint:sink(example_gen_server:store_value(Pid, TaintedVal)),
@@ -52,23 +58,32 @@ gen_server_main(String) ->
 
 %% ======= GEN SERVER IMPL =============
 
-start_link() -> 
+-spec start_link() -> gen_server:start_ret().
+start_link() ->
   gen_server:start_link(?MODULE, [], []).
 
-start_link(TaintedVal, NotTaintedVal) -> 
+-spec start_link(term(), term()) -> gen_server:start_ret().
+start_link(TaintedVal, NotTaintedVal) ->
   gen_server:start_link(?MODULE, [TaintedVal, NotTaintedVal], []).
 
+
+-spec store_value(pid(), term()) -> term().
 store_value(Pid, Value) ->
     gen_server:call(Pid, {store, Value}).
 
+-spec pop(pid()) -> term().
 pop(Pid) ->
     gen_server:call(Pid, pop).
 
+-spec stop(pid()) -> ok.
 stop(Pid) ->
     gen_server:call(Pid, terminate).
 
+-spec init([]) -> {ok, state()}.
 init([]) -> {ok, []}.
 
+-spec handle_call(Msg, gen_server:from(), state()) -> {reply, term(), state()} | {stop, normal, ok, state()}
+  when Msg :: {store, term()} | pop | terminate.
 handle_call({store, Value}, _From, State) ->
     {reply, Value, [Value | State]};
 handle_call(pop, _From, [Head | Tail]) ->
@@ -76,5 +91,6 @@ handle_call(pop, _From, [Head | Tail]) ->
 handle_call(terminate, _From, State) ->
     {stop, normal, ok, State}.
 
+-spec handle_cast(term(), state()) -> {noreply, state()}.
 handle_cast(_, State) ->
     {noreply, State}.

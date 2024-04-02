@@ -13,11 +13,13 @@
 % limitations under the License.
 
 -module(simple_example).
+-compile(warn_missing_spec_all).
 
 -export([
     simple_example_main/0
 ]).
 
+-spec simple_example_main() -> ok.
 simple_example_main() ->
   TaintedVal = finer_taint:source("test"),
   finer_taint:sink(TaintedVal),

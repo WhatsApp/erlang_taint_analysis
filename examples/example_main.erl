@@ -13,7 +13,7 @@
 % limitations under the License.
 
 -module(example_main).
-
+-compile(warn_missing_spec_all).
 -export([
     main/1
 ]).
@@ -21,7 +21,7 @@
 % This module is the runner of the examples. It sets up the dynamic component of the analysis
 % and runs the examples. Note that this file is excluded from being instrumented
 
-
+-spec main([string()]) -> ok | {error, term()}.
 main(["non-online-mode" | Args]) ->
 	finer_taint_compiler:instrument_known_stdlibs([{finer_taint_module, parallel_finer_taint}]),
   {ok, _} = application:ensure_all_started(taint_server),
@@ -46,13 +46,14 @@ main(Args) ->
   abstract_machine_proclet_sup:stop_all_proclets(),
   io:format("Initiated stopping proclets, gathering (20s timeout) ~n"),
   Dataflows = taint_gatherer:get_gathered_leaks(taint_gatherer, 20000, [notapid]),
-  
+
   io:format("Dataflows found: ~p~n", [Dataflows]),
   Output = taint_abstract_machine:map_leaks_to_leaks(Dataflows),
   io:format("Done gathering~n"),
 	io:format("Dataflows found: ~p~n", [Output]).
 
 
+-spec main_impl([string()]) -> ok | {error, term()}.
 main_impl(["simple"]) ->
   simple_example:simple_example_main();
 main_impl([Arg]) ->
