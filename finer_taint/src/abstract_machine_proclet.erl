@@ -119,7 +119,10 @@ handle_call(Msg, _From, State) ->
     {reply, ok, State}.
 
 -spec handle_cast(
-    {execute_instruction, Instruction :: taint_abstract_machine:instruction()}, state()
+    {run_instructions_file, FileName :: string()}
+    | {stop}
+    | {execute_instruction, Instruction :: taint_abstract_machine:instruction()},
+    state()
 ) ->
     {noreply, state()}
     | {stop, {shutdown, term()}, state()}.
