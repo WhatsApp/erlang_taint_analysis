@@ -18,7 +18,10 @@ load(
 )
 # @fb-only
 
-export_file(name = "taint_models", src = "finer_taint/priv/models.cfg")
+export_file(
+    name = "taint_models",
+    src = "finer_taint/priv/models.cfg",
+)
 
 erlang_application(
     name = "finer_taint",
@@ -29,7 +32,6 @@ erlang_application(
             "finer_taint/src/models/*.erl",
         ],
     ),
-    includes = glob(["finer_taint/include/*.hrl"]),
     applications = [
         "kernel",
         "stdlib",
@@ -41,6 +43,7 @@ erlang_application(
         "//third-party:power_shell",
     ],
     extra_includes = [],
+    includes = glob(["finer_taint/include/*.hrl"]),
     resources = [":taint_models"],
     version = "0.1.0",
 )
@@ -57,35 +60,38 @@ erlang_parse_transform(
 
 erlang_escript(
     name = "script",
+    emu_args = [
+        "+sbtu",
+        "+A1",
+    ],
+    include_priv = True,
     main_module = "run_finer_taint_escript",
     script_name = "run_finer_taint",
     deps = [
         ":finer_taint",
     ],
-    include_priv = True,
-    emu_args = [
-        "+sbtu",
-        "+A1",
-    ],
 )
 
 erlang_tests(
-    suites = ["finer_taint/test/finer_taint_SUITE.erl"],
-    deps = [":finer_taint_unittest_deps"],
     contacts = ["whatsapp_code_analysis"],
     labels = ["unit"],
+    suites = ["finer_taint/test/finer_taint_SUITE.erl"],
+    deps = [":finer_taint_unittest_deps"],
 )
 
 erlang_tests(
+    contacts = ["whatsapp_code_analysis"],
+    labels = ["unit"],
     suites = [
         "finer_taint/test/parallel_taint_SUITE.erl",
         "finer_taint/test/abstract_machine_util_SUITE.erl",
         "finer_taint/test/taint_gatherer_SUITE.erl",
         "finer_taint/test/abstract_machine_proclet_SUITE.erl",
     ],
-    deps = [":finer_taint_unittest_deps", ":finer_taint_SUITE"],
-    contacts = ["whatsapp_code_analysis"],
-    labels = ["unit"],
+    deps = [
+        ":finer_taint_SUITE",
+        ":finer_taint_unittest_deps",
+    ],
 )
 
 erlang_application(
@@ -96,31 +102,37 @@ erlang_application(
         "stdlib",
         "common_test",
     ],
-    labels = ["test_application", "unit_test_deps"],
+    labels = [
+        "test_application",
+        "unit_test_deps",
+    ],
 )
 
 erlang_application(
     name = "taint_server",
-    srcs = glob(["taint_server/src/*.erl", "taint_server/src/*.hrl"]),
-    includes = glob(["taint_server/include/*.hrl"]),
+    srcs = glob([
+        "taint_server/src/*.erl",
+        "taint_server/src/*.hrl",
+    ]),
+    app_src = "taint_server/src/taint_server.app.src",
     applications = [
         "kernel",
         "stdlib",
     ],
-    app_src = "taint_server/src/taint_server.app.src",
+    includes = glob(["taint_server/include/*.hrl"]),
     version = "0.1.0",
     visibility = ["PUBLIC"],
 )
 
 erlang_tests(
-    suites = glob(["taint_server/test/*_SUITE.erl"]),
-    deps = [
-        "stdlib",
-        "common_test",
-        ":taint_server",
-    ],
     contacts = ["whatsapp_code_analysis"],
     labels = ["unit"],
+    suites = glob(["taint_server/test/*_SUITE.erl"]),
+    deps = [
+        "common_test",
+        "stdlib",
+        ":taint_server",
+    ],
 )
 
 erlang_application(
@@ -130,15 +142,18 @@ erlang_application(
             "examples/*.erl",
         ],
     ),
-    applications = [":finer_taint", ":taint_server"],
-    visibility = ["PUBLIC"],
+    applications = [
+        ":finer_taint",
+        ":taint_server",
+    ],
     version = "0.1.0",
+    visibility = ["PUBLIC"],
 )
 
 erlang_escript(
     name = "examples",
+    include_priv = True,
     main_module = "example_main",
     script_name = "example_main",
     deps = [":all_examples"],
-    include_priv = True,
 )
