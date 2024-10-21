@@ -102,7 +102,7 @@ compile_helper(ModPath, Options) ->
     {Mod, Binary1} = compile_forms(InstrumentedForms),
     Binary1.
 
--spec get_finer_taint_cfg(string()) -> [term()].
+-spec get_finer_taint_cfg(string()) -> [dynamic()].
 get_finer_taint_cfg(CfgFileName) ->
     %% buck2 use resource/ dir
     FtConfig = filename:join(
@@ -202,6 +202,7 @@ get_module([_ | Rest]) -> get_module(Rest).
 
 -spec has_ms_transform(forms()) -> boolean().
 has_ms_transform([{attribute, _, file, {Path, _Line}} | Tail]) ->
+    % eqwalizer:ignore - assume `Path :: unicode:chardata()`
     case string:find(Path, "ms_transform.hrl") of
         nomatch -> has_ms_transform(Tail);
         _ -> true
