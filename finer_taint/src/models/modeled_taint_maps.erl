@@ -81,7 +81,7 @@ get(Key, Map) ->
     #{Key := Value} = Map,
     Value.
 
--spec find(Key, #{Key => Value, term() => term()}) -> {ok, Value} | error.
+-spec find(Key, #{Key => Value}) -> {ok, Value} | error.
 find(Key, Map) ->
     fold(
         fun
@@ -139,7 +139,7 @@ from_list_impl([], Map) ->
 from_list_impl([{Key, Value} | Tail], Map) ->
     from_list_impl(Tail, Map#{Key => Value}).
 
--spec with([K], #{K => V, term() => term()}) -> #{K => V}.
+-spec with([K], #{term() => V}) -> #{K => V}.
 with(Ks, Map) ->
     with_impl(Ks, Map, #{}).
 
@@ -239,12 +239,12 @@ next({Map, Iterator}) ->
             {RawKey, Value, {Map, Iterator2}}
     end.
 
--spec groups_from_list(fun((Elem) -> Key), fun((Elem) -> ValOut), [Elem]) -> #{Key := [ValOut]}.
+-spec groups_from_list(fun((Elem) -> Key), fun((Elem) -> ValOut), [Elem]) -> #{Key => [ValOut]}.
 groups_from_list(Fun, ValueFun, List) ->
     groups_from_list_impl(Fun, ValueFun, List, #{}).
 
--spec groups_from_list_impl(fun((Elem) -> Key), fun((Elem) -> ValOut), [Elem], #{Key := [ValOut]}) ->
-    #{Key := [ValOut]}.
+-spec groups_from_list_impl(fun((Elem) -> Key), fun((Elem) -> ValOut), [Elem], #{Key => [ValOut]}) ->
+    #{Key => [ValOut]}.
 groups_from_list_impl(KeyFun, ValueFun, [H | T], Acc) ->
     Key = KeyFun(H),
     OldList = maps:get(Key, Acc, []),
