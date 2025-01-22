@@ -190,7 +190,6 @@ instrument_with_sinks(Forms, Options) ->
 get_source([]) ->
     error(taint_unknown_module);
 get_source([{attribute, _, file, {Source, _}} | _]) ->
-    % eqwalizer:ignore - This should be cast_dynamic, but can't import eqwalizer module here because parse transform
     Source;
 get_source([_ | Rest]) ->
     get_source(Rest).
@@ -202,7 +201,6 @@ get_module([_ | Rest]) -> get_module(Rest).
 
 -spec has_ms_transform(forms()) -> boolean().
 has_ms_transform([{attribute, _, file, {Path, _Line}} | Tail]) ->
-    % eqwalizer:ignore - assume `Path :: unicode:chardata()`
     case string:find(Path, "ms_transform.hrl") of
         nomatch -> has_ms_transform(Tail);
         _ -> true
@@ -223,7 +221,6 @@ rewrite(Rest = [{attribute, _, finer_taint_compiled, _} | _], _, Acc) ->
 rewrite([], _, Acc) ->
     %% all input has been processed
     Forms = lists:reverse(Acc),
-    % eqwalizer:ignore This should be cast_dynamic, but can't import eqwalizer module here because parse transform
     [
         erl_parse:map_anno(fun(Anno) -> erl_anno:set_generated(true, Anno) end, Form)
      || Form <- Forms
@@ -1130,7 +1127,6 @@ compile_forms(Forms) ->
 -spec load_forms(binary()) -> {module(), forms()}.
 load_forms(Binary) ->
     {ok, {Module, [{abstract_code, {_, Forms}} | _]}} = beam_lib:chunks(Binary, [abstract_code, compile_info]),
-    % eqwalizer:ignore optimistic use of beam_lib API
     {Module, Forms}.
 
 -spec ms_transform(forms(), options()) -> forms().
