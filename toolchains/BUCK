@@ -18,7 +18,6 @@ load(
     "config_erlang_toolchain_rule",
     "get_primary_tools",
     "multi_version_toolchain_rule",
-    _toolchain_resources="toolchain_resources",
 )
 
 system_genrule_toolchain(
@@ -89,10 +88,5 @@ multi_version_toolchain_rule(
             "DEFAULT": [":erlang-local"],
         }
     ),
-    visibility=["PUBLIC"],
-)
-_toolchain_resources(
-    name="erlang-resources",
-    jsone="root//third-party:jsone",
     visibility=["PUBLIC"],
 )
