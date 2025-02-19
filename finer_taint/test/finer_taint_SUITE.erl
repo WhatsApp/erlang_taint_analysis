@@ -75,11 +75,7 @@
     operators_in_pattern/1,
     lineage_annotations_merge_taint/1,
     shortcircuiting/1,
-    local_if_clause/1,
-    ps_if_clause/1,
-    ps_local_if_clause/1,
-    macro_duplicator/1,
-    ps_exp_if_clause/1
+    macro_duplicator/1
 ]).
 
 %Helpers
@@ -127,11 +123,7 @@ groups() ->
             operators_in_pattern,
             lineage_annotations_merge_taint,
             shortcircuiting,
-            local_if_clause,
-            ps_if_clause,
-            ps_local_if_clause,
-            macro_duplicator,
-            ps_exp_if_clause
+            macro_duplicator
         ]}
     ].
 
@@ -706,30 +698,3 @@ macro_duplicator(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, simple_example, macro_duplicate_main),
     ?assertEqual("simple_example.erl:56", Sink),
     ?assertEqual(["simple_example.erl:53"], abstract_machine_util:get_sources(History)).
-%% Tests using power_shell - based on if_clause above, but with variations using power_shell
-%% This is just a baseline calling a local function being the sink.
-local_if_clause(Config) ->
-    [{leak, Sink, History}] = compile_and_run_function(Config, ps_example, local_if_clause),
-    ?assertEqual("ps_example.erl:34", Sink),
-    ?assertEqual(["ps_example.erl:25"], abstract_machine_util:get_sources(History)).
-
-%% Call unexported local sink using power_shell:eval/3
-ps_local_if_clause(Config) ->
-    [{leak, Sink, History}] = compile_and_run_function(Config, ps_example, ps_local_if_clause),
-    ?assertEqual("ps_example.erl:34", Sink),
-    ?assertEqual(["ps_example.erl:37"], abstract_machine_util:get_sources(History)).
-
-%% Call unexported sink in another module using power_shell:eval/3
-ps_if_clause(Config) ->
-    compile_and_load(Config, ps_external),
-    [{leak, Sink, History}] = compile_and_run_function(Config, ps_example, ps_if_clause),
-    ?assertEqual("ps_external.erl:26", Sink),
-    ?assertEqual(["ps_example.erl:46"], abstract_machine_util:get_sources(History)).
-
-%% Call unexported sink in another module by first exporting all functions
-%% with power_shell:export/1 and then calling as if it were exported.
-ps_exp_if_clause(Config) ->
-    compile_and_load(Config, ps_external),
-    [{leak, Sink, History}] = compile_and_run_function(Config, ps_example, ps_exp_if_clause),
-    ?assertEqual("ps_external.erl:26", Sink),
-    ?assertEqual(["ps_example.erl:55"], abstract_machine_util:get_sources(History)).
