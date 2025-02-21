@@ -134,9 +134,6 @@ init_per_suite(Config) ->
     {module, modeled_taint_maps} = finer_taint_compiler:instrument_loaded_module(modeled_taint_maps, [
         {finer_taint_module, ct_finer_taint}
     ]),
-    {module, modeled_power_shell} = finer_taint_compiler:instrument_loaded_module(modeled_power_shell, [
-        {finer_taint_module, ct_finer_taint}
-    ]),
     {module, modeled_erlang} = finer_taint_compiler:instrument_loaded_module(modeled_erlang, [
         {finer_taint_module, ct_finer_taint}
     ]),

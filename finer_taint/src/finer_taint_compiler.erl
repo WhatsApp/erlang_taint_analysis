@@ -995,8 +995,6 @@ intercepted_functions({atom, Anno, erlang}, {atom, _, get}, #rewrite_state{modul
     {?ATOM(modeled_erlang), ?ATOM(mget)};
 intercepted_functions({atom, Anno, erlang}, {atom, _, element}, _State) ->
     {?ATOM(modeled_erlang), ?ATOM(elemnt)};
-intercepted_functions({atom, Anno, power_shell}, {atom, _, eval}, _State) ->
-    {?ATOM(modeled_power_shell), ?ATOM(eval)};
 intercepted_functions({atom, Anno, ModuleName}, Func, #rewrite_state{renamed_modules = Renames}) ->
     {?ATOM(maps:get(ModuleName, Renames, ModuleName)), Func};
 % Module can be any expression
