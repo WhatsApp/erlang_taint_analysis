@@ -40,7 +40,6 @@ erlang_application(
         "syntax_tools",
         ":taint_server",
         "//third-party:jsone",
-        "//third-party:power_shell",
     ],
     extra_includes = [],
     includes = glob(["finer_taint/include/*.hrl"]),
