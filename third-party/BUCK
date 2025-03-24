@@ -23,20 +23,3 @@ erlang_application(
     version="1.8.1",
     visibility=["PUBLIC"],
 )
-
-erlang_application(
-    name="power_shell",
-    srcs=glob(["power_shell/src/*.erl"]),
-    app_src="power_shell/src/power_shell.app.src",
-    erl_opts=["+debug_info", "+inline"],
-    shell_libs=[],
-    use_global_parse_transforms=False,
-    build_edoc_chunks=False,
-    version="1.3.0",
-    visibility=["PUBLIC"],
-    applications=[
-        "kernel",
-        "stdlib",
-        "compiler",
-    ],
-)
