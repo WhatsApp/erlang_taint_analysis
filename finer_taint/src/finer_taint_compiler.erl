@@ -217,7 +217,7 @@ has_ms_transform([_ | Tail]) ->
 %%====================================================================
 -spec rewrite(forms(), #rewrite_state{}, forms()) -> forms().
 rewrite(Rest = [{attribute, _, finer_taint_compiled, _} | _], _, Acc) ->
-    lists:reverse(Acc) ++ Rest;
+    lists:reverse(Acc, Rest);
 rewrite([], _, Acc) ->
     %% all input has been processed
     Forms = lists:reverse(Acc),

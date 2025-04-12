@@ -810,7 +810,7 @@ propagate(
     State = #taint_am_state{stack = [{pattern_taint, tuple, TupleValues} | Stack]}
 ) when Arity == length(TupleValues) ->
     TupleValues1 = lists:map(fun(V) -> append_taint_history(V, Loc) end, TupleValues),
-    State#taint_am_state{stack = lists:reverse(TupleValues1) ++ Stack};
+    State#taint_am_state{stack = lists:reverse(TupleValues1, Stack)};
 %% Deconstructing a tuple  pattern when top of stack is tainted
 propagate(
     {deconstruct_pattern, {{cons}, Loc}},
@@ -850,7 +850,7 @@ propagate(
                 NewTaint = append_taint_history(taint_value(Val), Loc),
                 lists:map(fun(_) -> NewTaint end, BinPattern)
         end,
-    State#taint_am_state{stack = lists:reverse(NewTopStack) ++ Stack};
+    State#taint_am_state{stack = lists:reverse(NewTopStack, Stack)};
 propagate(
     {deconstruct_pattern, {{tuple, Arity}, _Loc}},
     State = #taint_am_state{stack = [{notaint, []} | Stack]}
