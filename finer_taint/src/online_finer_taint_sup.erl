@@ -13,14 +13,14 @@
 % limitations under the License.
 
 %% % @format
-%% @doc
-%% A top level supervisor for abstract machines, that starts
-%% everything needed for executing multiple taint_abstract_machines
-%%
-%% NOTE: currently this is missing taint_message_passer initialization
-%% @end
 
 -module(online_finer_taint_sup).
+-moduledoc """
+A top level supervisor for abstract machines, that starts
+everything needed for executing multiple taint_abstract_machines
+
+NOTE: currently this is missing taint_message_passer initialization
+""".
 -compile(warn_missing_spec_all).
 
 -behaviour(supervisor).

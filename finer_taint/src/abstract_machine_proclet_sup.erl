@@ -13,13 +13,13 @@
 % limitations under the License.
 
 %% % @format
-%% @doc
-%% Supervisor for abstract_machine_proclets
-%%
-%% Used to create new proclets and to tell them to stop
-%% @end
 
 -module(abstract_machine_proclet_sup).
+-moduledoc """
+Supervisor for abstract_machine_proclets
+
+Used to create new proclets and to tell them to stop
+""".
 -compile(warn_missing_spec_all).
 
 -behaviour(supervisor).

@@ -13,23 +13,23 @@
 % limitations under the License.
 
 %%% % @format
-%%% @doc
-%%% Taint abstract machine proclet is responsible for executing
-%%% a single instruction stream (process) on the taint_abstract_machine.
-%%%
-%%% In essence this module wraps the taint_abstract_machine, such that
-%%% multiple instruction streams can be executed in parallel.
-%%%
-%%% The found leaks are reported to taint_gatherer once this process
-%%% stops.
-%%%
-%%% The process stops either due to a failure in taint_abstract_machine
-%%% or when abstract_machine_proclet:stop/1 is called
-%%%
-%%% Usually new instances of abstract_machine_proclet can be obtained
-%%% via abstract_machine_proclet_sup:new_proc()
-%%% @end
 -module(abstract_machine_proclet).
+-moduledoc """
+Taint abstract machine proclet is responsible for executing
+a single instruction stream (process) on the taint_abstract_machine.
+
+In essence this module wraps the taint_abstract_machine, such that
+multiple instruction streams can be executed in parallel.
+
+The found leaks are reported to taint_gatherer once this process
+stops.
+
+The process stops either due to a failure in taint_abstract_machine
+or when abstract_machine_proclet:stop/1 is called
+
+Usually new instances of abstract_machine_proclet can be obtained
+via abstract_machine_proclet_sup:new_proc()
+""".
 -compile(warn_missing_spec_all).
 -behaviour(gen_server).
 
