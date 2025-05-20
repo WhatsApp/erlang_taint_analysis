@@ -39,7 +39,6 @@ erlang_application(
         "crypto",
         "syntax_tools",
         ":taint_server",
-        "//third-party:jsone",
     ],
     extra_includes = [],
     includes = glob(["finer_taint/include/*.hrl"]),

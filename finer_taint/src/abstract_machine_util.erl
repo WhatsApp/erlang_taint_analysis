@@ -123,7 +123,7 @@ print_leaks(Leaks) ->
     print_leaks(Leaks, []).
 -spec print_leaks(taint_abstract_machine:leaks(), list(leak_evidence())) -> binary().
 print_leaks([], Acc) ->
-    jsone:encode(Acc);
+    iolist_to_binary(json:encode(Acc));
 print_leaks([{leak, Sink, History} | Tail], Acc) ->
     Histories = linearize_history(History),
     Leaks = [history_to_leakeage_evidence(Sink, Hist) || Hist <- Histories],
@@ -557,7 +557,7 @@ to_infer_bug_report(History, Sink) ->
 -spec to_infer_report(taint_abstract_machine:leaks()) -> binary().
 to_infer_report(Leaks) ->
     Reports = to_infer_report(Leaks, []),
-    jsone:encode(Reports).
+    iolist_to_binary(json:encode(Reports)).
 
 -spec to_infer_report(taint_abstract_machine:leaks(), list(infer_report())) -> list(infer_report()).
 to_infer_report([], Acc) ->
