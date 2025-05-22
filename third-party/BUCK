@@ -19,7 +19,6 @@ erlang_application(
     erl_opts=["+debug_info", "+inline"],
     shell_libs=[],
     use_global_parse_transforms=False,
-    build_edoc_chunks=False,
     version="1.8.1",
     visibility=["PUBLIC"],
 )
