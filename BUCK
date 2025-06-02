@@ -12,13 +12,14 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+load("@fbsource//tools/build_defs:fb_native_wrapper.bzl", "fb_native")
 load(
     "@prelude//erlang:erlang_toolchain.bzl",
     "erlang_parse_transform",
 )
 # @fb-only
 
-export_file(
+fb_native.export_file(
     name = "taint_models",
     src = "finer_taint/priv/models.cfg",
 )
