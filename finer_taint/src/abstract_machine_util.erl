@@ -357,58 +357,63 @@ get_arg_lineage_raw(Leaks) ->
     Acc :: #{{mfan(), mfan()} => map()}.
 get_arg_lineage_impl([_L = {arg_leak, {ToMFA, ToArgN, _Loc}, Froms} | Tail], MapAcc) ->
     Acc1 = lists:foldl(
-        fun
-            HistoryFolder({dataflow_src, {FromMFA, FromArgN}, Annotation}, FoldAcc) ->
-                Key = {{FromMFA, FromArgN}, {ToMFA, ToArgN}},
-                Value = maps:get(Key, FoldAcc, #{}),
-                NewValue = Value#{Annotation => ok},
-                FoldAcc#{Key => NewValue};
-            HistoryFolder({arg_taint, {FromMFA, FromArgN}}, FoldAcc) ->
-                Key = {{FromMFA, FromArgN}, {ToMFA, ToArgN}},
-                Value = maps:get(Key, FoldAcc, #{}),
-                % arg_taint doesn't have an annotation
-                NewValue = Value#{[] => ok},
-                FoldAcc#{Key => NewValue};
-            HistoryFolder({step, _}, FoldAcc) ->
-                FoldAcc;
-            HistoryFolder({message_pass, _}, FoldAcc) ->
-                FoldAcc;
-            HistoryFolder({call_site, _, _}, FoldAcc) ->
-                FoldAcc;
-            HistoryFolder({return_site, _, _}, FoldAcc) ->
-                FoldAcc;
-            HistoryFolder({joined_history, _, Histories}, FoldAcc) ->
-                % eqwalizer:ignore The lists case is handeld below, but not captured in types
-                HistoryFolder(Histories, FoldAcc);
-            HistoryFolder({blackhole, Sources}, FoldAcc) ->
-                % eqwalizer:ignore The lists of sources case is handeld below, but not captured in types
-                HistoryFolder([Sources], FoldAcc);
-            HistoryFolder(HistoriesList, FoldAcc) when is_list(HistoriesList) ->
-                EachHistoryFolded = [
-                    lists:foldl(HistoryFolder, #{}, Hist)
-                 || Hist <- HistoriesList
-                ],
-                NewFoldAcc = lists:foldl(
-                    fun(FoldAcclet, Acc) ->
-                        maps:merge_with(
-                            fun(_, Val1, Val2) when is_map(Val1), is_map(Val2) ->
-                                maps:merge_with(fun(_, ok, ok) -> ok end, Val1, Val2)
-                            end,
-                            Acc,
-                            FoldAcclet
-                        )
-                    end,
-                    FoldAcc,
-                    EachHistoryFolded
-                ),
-                NewFoldAcc
-        end,
+        history_folder(ToMFA, ToArgN),
         MapAcc,
         Froms
     ),
     get_arg_lineage_impl(Tail, Acc1);
 get_arg_lineage_impl([], Acc) ->
     Acc.
+
+-spec history_folder(erlang:mfa(), integer()) ->
+    fun((taint_abstract_machine:taint_history_point() | [taint_abstract_machine:taint_history()], Acc) -> Acc)
+when
+    Acc :: #{{mfan(), mfan()} => map()}.
+history_folder(ToMFA, ToArgN) ->
+    fun
+        HistoryFolder({dataflow_src, {FromMFA, FromArgN}, Annotation}, FoldAcc) ->
+            Key = {{FromMFA, FromArgN}, {ToMFA, ToArgN}},
+            Value = maps:get(Key, FoldAcc, #{}),
+            NewValue = Value#{Annotation => ok},
+            FoldAcc#{Key => NewValue};
+        HistoryFolder({arg_taint, {FromMFA, FromArgN}}, FoldAcc) ->
+            Key = {{FromMFA, FromArgN}, {ToMFA, ToArgN}},
+            Value = maps:get(Key, FoldAcc, #{}),
+            % arg_taint doesn't have an annotation
+            NewValue = Value#{[] => ok},
+            FoldAcc#{Key => NewValue};
+        HistoryFolder({step, _}, FoldAcc) ->
+            FoldAcc;
+        HistoryFolder({message_pass, _}, FoldAcc) ->
+            FoldAcc;
+        HistoryFolder({call_site, _, _}, FoldAcc) ->
+            FoldAcc;
+        HistoryFolder({return_site, _, _}, FoldAcc) ->
+            FoldAcc;
+        HistoryFolder({joined_history, _, Histories}, FoldAcc) ->
+            HistoryFolder(Histories, FoldAcc);
+        HistoryFolder({blackhole, Sources}, FoldAcc) ->
+            HistoryFolder([Sources], FoldAcc);
+        HistoryFolder(HistoriesList, FoldAcc) when is_list(HistoriesList) ->
+            EachHistoryFolded = [
+                lists:foldl(HistoryFolder, #{}, Hist)
+             || Hist <- HistoriesList
+            ],
+            NewFoldAcc = lists:foldl(
+                fun(FoldAcclet, Acc) ->
+                    maps:merge_with(
+                        fun(_, Val1, Val2) when is_map(Val1), is_map(Val2) ->
+                            maps:merge_with(fun(_, ok, ok) -> ok end, Val1, Val2)
+                        end,
+                        Acc,
+                        FoldAcclet
+                    )
+                end,
+                FoldAcc,
+                EachHistoryFolded
+            ),
+            NewFoldAcc
+    end.
 
 % Takes a list of leaks() produced in the lineage mode and a query
 % in the form of {FromMFA, FromArgN, ToMFA, ToArgN} and returns
