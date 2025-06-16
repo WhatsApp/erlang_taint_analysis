@@ -15,6 +15,7 @@
 %% % @format
 -module(finer_taint_compiler).
 -compile(warn_missing_spec_all).
+-eqwalizer({unlimited_refinement, instrument_expression/2}).
 
 %%====================================================================
 %% API
@@ -621,8 +622,6 @@ instrument_expression({call, Anno, Func, Args}, State) ->
     {PreInstruments, ReverseInstrumentedArgs, []} = unzip_flatten(
         [ssa_iffy(instrument_expression(A, State)) || A <- lists:reverse(Args)]
     ),
-    % erl_parse:af_remote_function() is not compatible with expr()
-    % eqwalizer:ignore This should be cast_dynamic, but can't import eqwalizer module here because parse transform
     {PreFunc, Func1, []} = ssa_iffy(instrument_expression(Func, State)),
     CurrentModule = ?ATOM(State#rewrite_state.module),
     FuncName =
