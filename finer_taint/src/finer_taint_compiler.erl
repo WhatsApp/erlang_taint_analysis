@@ -1009,17 +1009,19 @@ intercepted_functions(Module, Func, #rewrite_state{renamed_modules = Renames}) w
     {dynamic(), [expr() | erl_parse:af_generator()]}.
 split_to_next_qualifier([], Filters) ->
     {lists:reverse(Filters), []};
-split_to_next_qualifier(Tail = [{generate, _, _, _} | _], Filters) ->
-    {lists:reverse(Filters), Tail};
-split_to_next_qualifier(Tail = [{b_generate, _, _, _} | _], Filters) ->
-    {lists:reverse(Filters), Tail};
-split_to_next_qualifier(Tail = [{m_generate, _, _, _} | _], Filters) ->
-    {lists:reverse(Filters), Tail};
-split_to_next_qualifier([Head | Tail], Filters) ->
-    % eqwalizer:ignore eqWAlizer limitation in occurrence typing
-    case erl_lint:is_guard_test(Head) of
-        true -> split_to_next_qualifier(Tail, [[Head] | Filters]);
-        _ -> {Filters, [Head | Tail]}
+split_to_next_qualifier(Rest = [Head | Tail], Filters) ->
+    case Head of
+        {generate, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        {b_generate, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        {m_generate, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        _ ->
+            case erl_lint:is_guard_test(Head) of
+                true -> split_to_next_qualifier(Tail, [[Head] | Filters]);
+                _ -> {Filters, [Head | Tail]}
+            end
     end.
 
 -spec rewrite_qualifier([expr() | erl_parse:af_generator()], erl_parse:abstract_expr(), [expr()]) -> expr().
