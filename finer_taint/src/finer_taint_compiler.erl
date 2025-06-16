@@ -106,11 +106,11 @@ compile_helper(ModPath, Options) ->
 -spec get_finer_taint_cfg(string()) -> [dynamic()].
 get_finer_taint_cfg(CfgFileName) ->
     %% buck2 use resource/ dir
+    BeamFile = code:where_is_file("finer_taint_compiler.beam"),
+    BeamFile =/= non_existing orelse error({missing_beam, "finer_taint_compiler.beam"}),
     FtConfig = filename:join(
         [
-            % we assume that code:where_is_file("finer_taint_compiler.beam") is successful
-            % eqwalizer:ignore
-            filename:dirname(code:where_is_file("finer_taint_compiler.beam")),
+            filename:dirname(BeamFile),
             "resources",
             CfgFileName
         ]
