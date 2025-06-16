@@ -1128,5 +1128,6 @@ load_forms(Binary) ->
 
 -spec ms_transform(forms(), options()) -> forms().
 ms_transform(Forms, Options) ->
-    % eqwalizer:ignore optimistic use of ms_transform API
-    ms_transform:parse_transform(Forms, Options).
+    Result = ms_transform:parse_transform(Forms, Options),
+    is_list(Result) orelse error(ms_transform),
+    Result.
