@@ -15,9 +15,7 @@
 load("@prelude//toolchains:genrule.bzl", "system_genrule_toolchain")
 load(
     "@prelude//erlang:erlang_toolchain.bzl",
-    "config_erlang_toolchain_rule",
-    "get_primary_tools",
-    "multi_version_toolchain_rule",
+    "erlang_toolchain",
 )
 
 system_genrule_toolchain(
@@ -34,7 +32,7 @@ erlang_otp_binaries(
 )
 
 
-config_erlang_toolchain_rule(
+erlang_toolchain(
     name="erlang-local",
     otp_binaries=":local",
     visibility=["PUBLIC"],
@@ -44,7 +42,7 @@ config_erlang_toolchain_rule(
     parse_transforms=[],
 )
 
-config_erlang_toolchain_rule(
+erlang_toolchain(
     name="erlang-taint",
     otp_binaries=":local",
     visibility=["PUBLIC"],
@@ -54,7 +52,7 @@ config_erlang_toolchain_rule(
     parse_transforms=["root//:finer_taint_compiler"],
 )
 
-config_erlang_toolchain_rule(
+erlang_toolchain(
     name="erlang-online-taint",
     otp_binaries=":local",
     visibility=["PUBLIC"],
@@ -78,14 +76,14 @@ platform(name="default", constraint_values=[":no"])
 platform(name="finer-taint-mode", constraint_values=[":finer_taint"])
 platform(name="online-finer-taint-mode", constraint_values=[":online_finer_taint"])
 
-multi_version_toolchain_rule(
+native.toolchain_alias(
     name="erlang-default",
-    targets=select(
+    actual=select(
         {
-            ":notaint-set": [":erlang-local", ":erlang-taint"],
-            ":finer-taint-set": [":erlang-taint"],
-            ":online-finer-taint-set": [":erlang-online-taint"],
-            "DEFAULT": [":erlang-local"],
+            ":notaint-set": ":erlang-local",
+            ":finer-taint-set": ":erlang-taint",
+            ":online-finer-taint-set": ":erlang-online-taint",
+            "DEFAULT": ":erlang-local",
         }
     ),
     visibility=["PUBLIC"],
