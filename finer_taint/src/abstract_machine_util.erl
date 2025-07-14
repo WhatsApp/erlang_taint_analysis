@@ -283,13 +283,10 @@ filter_message_pass([], MaybeAfterFirstMessagePass, BeforeFirstMessagePass) ->
 % Apply filter_message_pass to the Lineage obtained from get_arg_lineage_impl
 -spec fold_message_passes(#{tuple() => #{list() => ok}}) -> #{tuple() => #{list() => ok}}.
 fold_message_passes(AnnotatedLineage) ->
-    maps:map(
-        fun(_, Annotation) ->
-            Filtered = [filter_message_pass(Annot) || Annot <- maps:keys(Annotation)],
-            maps:from_keys(Filtered, ok)
-        end,
-        AnnotatedLineage
-    ).
+    #{
+        K => #{filter_message_pass(Annot) => ok || Annot := _ <- Annotation}
+     || K := Annotation <- AnnotatedLineage
+    }.
 
 % Takes a list of leaks() produced in the lineage mode
 % and gives all unique edges between function arguments in it
