@@ -97,12 +97,10 @@ init_per_testcase(TestCase, Config) ->
     DataDir = ?config(priv_dir, Config),
     FileName = filename:join(DataDir, atom_to_list(TestCase) ++ "_analaysis_instr"),
     application:set_env(taint_server, instructions_stream_prefix, FileName),
-    {ok, StartedApps} = application:ensure_all_started(taint_server),
-    [{statrted_apps, StartedApps}, {analysis_instr, FileName} | Config].
+    UpdatedConfig = wa_test_init:ensure_all_started(Config, taint_server),
+    [{analysis_instr, FileName} | UpdatedConfig].
 
-end_per_testcase(_TestCase, Config) ->
-    ToStopApps = proplists:get_value(statrted_apps, Config),
-    lists:foreach(fun application:stop/1, ToStopApps),
+end_per_testcase(_TestCase, _Config) ->
     ok.
 
 compile(Modules, Config) ->
