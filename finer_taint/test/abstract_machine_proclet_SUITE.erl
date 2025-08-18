@@ -19,8 +19,9 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(abstract_machine_proclet_SUITE).
+-typing([eqwalizer]).
 
--include_lib("stdlib/include/assert.hrl").
+-include_lib("assert/include/assert.hrl").
 
 %% Test server callbacks
 -export([
@@ -89,7 +90,7 @@ message_pass_between_proclets(_Config) ->
     done(),
     done(),
     abstract_machine_proclet_sup:stop_all_proclets(),
-    Leaks = taint_gatherer:get_gathered_leaks(taint_gatherer, 1000, [wait_till_timeout]),
+    Leaks = taint_gatherer:get_gathered_leaks(taint_gatherer, 1000, [notapid]),
     ?assertEqual(
         #{
             {leak, "sink.erl1", [
