@@ -41,7 +41,6 @@ erlang_application(
         "syntax_tools",
         ":taint_server",
     ],
-    extra_includes = [],
     includes = glob(["finer_taint/include/*.hrl"]),
     resources = [":taint_models"],
     version = "0.1.0",
