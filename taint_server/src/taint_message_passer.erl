@@ -39,7 +39,7 @@ uninit() ->
 blocking_get(MessageId) ->
     blocking_get(MessageId, 12000).
 
--spec blocking_get(string(), number()) -> taint_abstract_machine:taint_value().
+-spec blocking_get(string(), erlang:timeout()) -> taint_abstract_machine:taint_value().
 blocking_get(MessageId, Timeout) ->
     case ets:insert_new(taint_messages, {MessageId, nomsg, self()}) of
         false ->
