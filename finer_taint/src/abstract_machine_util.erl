@@ -290,7 +290,7 @@ fold_message_passes(AnnotatedLineage) ->
 
 % Takes a list of leaks() produced in the lineage mode
 % and gives all unique edges between function arguments in it
--spec get_arg_lineage(taint_abstract_machine:leaks(), atom()) -> iodata().
+-spec get_arg_lineage(taint_abstract_machine:leaks(), atom()) -> string().
 get_arg_lineage(Leaks, OutputFormat) ->
     AnnotatedLineage = get_arg_lineage_impl(Leaks, #{}),
     FoldedMessagesLineage = fold_message_passes(AnnotatedLineage),
@@ -331,7 +331,7 @@ get_arg_lineage(Leaks, OutputFormat) ->
                 )
             );
         csv ->
-            [
+            lists:flatten([
                 "FromM,FromF,FromA,FromArgN,ToM,ToF,ToA,ToArgN,Annot\n"
                 | [
                     [
@@ -342,7 +342,7 @@ get_arg_lineage(Leaks, OutputFormat) ->
                     ]
                  || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} <- Lineage
                 ]
-            ]
+            ])
     end.
 
 -spec get_arg_lineage_raw(taint_abstract_machine:leaks()) -> [tuple()].

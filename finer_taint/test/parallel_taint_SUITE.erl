@@ -23,6 +23,7 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(parallel_taint_SUITE).
+-typing([eqwalizer]).
 
 -include_lib("common_test/include/ct.hrl").
 -include_lib("stdlib/include/assert.hrl").
@@ -106,9 +107,9 @@ end_per_testcase(_TestCase, _Config) ->
 compile(Modules, Config) ->
     DataDir = ?config(data_dir, Config),
     CompileMod = fun(Mod) ->
-        ModFilename = unicode:characters_to_list(io_lib:format("~p.erl", [Mod])),
+        ModFilename = [_ | _] = unicode:characters_to_list(io_lib:format("~p.erl", [Mod])),
         ModPath = filename:join([DataDir, ModFilename]),
-        {ok, Mod, Binary} = compile:file(ModPath, [debug_info, binary]),
+        {ok, Mod, Binary = <<_/binary>>} = compile:file(ModPath, [debug_info, binary]),
         {ok, {Mod, [{abstract_code, {_, Forms}} | _]}} = beam_lib:chunks(Binary, [abstract_code, compile_info]),
         io:format("~p~n", [Forms]),
         {Mod, Forms}
