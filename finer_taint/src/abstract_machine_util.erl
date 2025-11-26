@@ -233,7 +233,7 @@ annotations_impl([{message_pass, Loc} | Tail]) ->
 % Pretty print all the annotations.
 -spec annotations(#{list() => ok}) -> [string()].
 annotations(Map) when is_map(Map) ->
-    [string:join(annotations_impl(Annot), ";") || Annot <- maps:keys(Map)].
+    [string:join(annotations_impl(Annot), ";") || Annot := _ <- Map].
 
 % Filters out redudant message passes in a taint history For example
 % step1->step2->message_pass->step->message_pass->step3 would become
@@ -294,7 +294,6 @@ fold_message_passes(AnnotatedLineage) ->
 get_arg_lineage(Leaks, OutputFormat) ->
     AnnotatedLineage = get_arg_lineage_impl(Leaks, #{}),
     FoldedMessagesLineage = fold_message_passes(AnnotatedLineage),
-    Lineage = maps:keys(FoldedMessagesLineage),
     case OutputFormat of
         human_readable ->
             lists:flatten(
@@ -304,7 +303,7 @@ get_arg_lineage(Leaks, OutputFormat) ->
                             "~p:~p/~p-Arg~p -> ~p:~p/~p-Arg~p~n",
                             [FromM, FromF, FromA, FromArgN, ToM, ToF, ToA, ToArgN]
                         )
-                     || {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} <- Lineage
+                     || {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} := _ <- FoldedMessagesLineage
                     ]
                 )
             );
@@ -326,7 +325,7 @@ get_arg_lineage(Leaks, OutputFormat) ->
                                 string:join(annotations(maps:get(K, AnnotatedLineage)), "\n  ")
                             ]
                         )
-                     || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} <- Lineage
+                     || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} := _ <- FoldedMessagesLineage
                     ]
                 )
             );
@@ -340,7 +339,7 @@ get_arg_lineage(Leaks, OutputFormat) ->
                         ])
                      || Annot <- annotations(maps:get(K, FoldedMessagesLineage))
                     ]
-                 || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} <- Lineage
+                 || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} := _ <- FoldedMessagesLineage
                 ]
             ])
     end.
