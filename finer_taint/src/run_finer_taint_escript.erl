@@ -24,7 +24,7 @@
 %% Escript that runs the finer taint abstract machine and
 %% produces useable outputs
 %%====================================================================
--type stack() :: list(mfa()).
+-type stack() :: [mfa()].
 
 %% escript Entry point
 -spec main([string()]) -> ok.
@@ -96,7 +96,7 @@ main(_) ->
     io:format("\trun_finer_taint detect_leaks path/to/dynamic_lineage.cfg <processing commands>~n", []),
     io:format("\trun_finer_taint <subcommand_mode>~n~n~s", [SubCommandHelp]).
 
--spec run_subcommand(atom(), list(string())) -> ok.
+-spec run_subcommand(atom(), [string()]) -> ok.
 run_subcommand(flamegraph, Tail) ->
     {Paths, Commands} = lists:splitwith(
         fun
@@ -128,7 +128,7 @@ run_subcommand(RunFunction, Tail) ->
     io:format("Done running abstract machine~n"),
     extract_from_state_subcommand(Leaks, Commands).
 
--spec flamegraph(list(file:filename())) -> list(string()).
+-spec flamegraph([file:filename()]) -> [string()].
 flamegraph(Paths) ->
     StackMap = lists:foldl(
         fun(Path, Acc) ->
@@ -201,7 +201,7 @@ flamegraph([_SomeInstruction | OtherInstructions], Stack, State) ->
 -spec add_one(integer()) -> integer().
 add_one(Value) -> Value + 1.
 
--spec extract_from_state_subcommand(taint_abstract_machine:leaks() | iodata(), list(string())) -> ok.
+-spec extract_from_state_subcommand(taint_abstract_machine:leaks() | iodata(), [string()]) -> ok.
 extract_from_state_subcommand(Leaks, ["-query-arg-lineage", Query | Tail]) ->
     [FromM, FromF, FromA, FromArgN, ToM, ToF, ToA, ToArgN] = split_query(Query),
     FromMFA = {list_to_atom(FromM), list_to_atom(FromF), list_to_integer(FromA)},

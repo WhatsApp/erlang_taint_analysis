@@ -121,7 +121,7 @@ consult_from_string_impl({done, Result, LeftOverChars}) ->
 -spec print_leaks(taint_abstract_machine:leaks()) -> binary().
 print_leaks(Leaks) ->
     print_leaks(Leaks, []).
--spec print_leaks(taint_abstract_machine:leaks(), list(leak_evidence())) -> binary().
+-spec print_leaks(taint_abstract_machine:leaks(), [leak_evidence()]) -> binary().
 print_leaks([], Acc) ->
     iolist_to_binary(json:encode(Acc));
 print_leaks([{leak, Sink, History} | Tail], Acc) ->
@@ -216,7 +216,7 @@ get_covered_inst([], Output) ->
     Output.
 
 % Pretty print the annotations.
--spec annotations_impl(taint_abstract_machine:taint_history()) -> list(string()).
+-spec annotations_impl(taint_abstract_machine:taint_history()) -> [string()].
 annotations_impl([]) ->
     [];
 annotations_impl([{blackhole, _} | Tail]) ->
@@ -560,7 +560,7 @@ to_infer_report(Leaks) ->
     Reports = to_infer_report(Leaks, []),
     iolist_to_binary(json:encode(Reports)).
 
--spec to_infer_report(taint_abstract_machine:leaks(), list(infer_report())) -> list(infer_report()).
+-spec to_infer_report(taint_abstract_machine:leaks(), [infer_report()]) -> [infer_report()].
 to_infer_report([], Acc) ->
     Acc;
 to_infer_report([{leak, Sink, History} | Tail], Acc) ->
