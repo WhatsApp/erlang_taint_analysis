@@ -1005,7 +1005,7 @@ propagate(
     not is_map_key(Module, LineageModulesDenyMap)
 ->
     {Args, RestOfStack} = lists:split(Arity, Stack0),
-    EnumArgs = lists:zip(lists:seq(1, Arity), Args),
+    EnumArgs = lists:enumerate(Args),
     ArgLeaks = [
         begin
             TaintValue = taint_value(TVal),
