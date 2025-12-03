@@ -22,6 +22,7 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(finer_taint_SUITE).
+-typing([eqwalizer]).
 
 -include_lib("common_test/include/ct.hrl").
 -include_lib("stdlib/include/assert.hrl").
@@ -145,9 +146,10 @@ end_per_suite(_Config) ->
 compile(Modules, Config) ->
     DataDir = ?config(data_dir, Config),
     CompileMod = fun(Mod) ->
-        ModFilename = unicode:characters_to_list(io_lib:format("~p.erl", [Mod])),
+        ModFilename = lists:flatten(io_lib:format("~p.erl", [Mod])),
         ModPath = filename:join([DataDir, ModFilename]),
-        {ok, Mod, Binary} = compile:file(ModPath, [debug_info, binary]),
+        true = is_list(ModPath),
+        {ok, Mod, Binary = <<_/binary>>} = compile:file(ModPath, [debug_info, binary]),
         {ok, {Mod, [{abstract_code, {_, Forms}} | _]}} = beam_lib:chunks(Binary, [abstract_code, compile_info]),
         io:format("~p~n", [Forms]),
         {Mod, Forms}
@@ -163,11 +165,12 @@ compile_and_load(Config, Module) ->
     % does not crash erl_expand_records
     ?assertNotException(error, function_clause, erl_expand_records:module(InstrumentedForms, [debug_info])),
     io:format("~p: ~n~s~n", [Module, erl_prettypr:format(erl_syntax:form_list(InstrumentedForms))]),
-    {ok, Module, Binary} = compile:forms(InstrumentedForms, [debug_info, {feature, maybe_expr, enable}]),
+    {ok, Module, Binary = <<_/binary>>} = compile:forms(InstrumentedForms, [debug_info]),
     DataDir = ?config(data_dir, Config),
     code:add_patha(DataDir),
-    BeamFileName = unicode:characters_to_list(io_lib:format("~p.beam", [Module])),
+    BeamFileName = lists:flatten(io_lib:format("~p.beam", [Module])),
     BeamPath = filename:join(DataDir, BeamFileName),
+    true = is_list(BeamPath),
     ok = file:write_file(BeamPath, Binary),
     {module, Module} = code:load_binary(Module, BeamPath, Binary).
 
@@ -650,7 +653,7 @@ test_comprehension(Comprehension, CompareWith) ->
     InstrumentedLc = finer_taint_compiler:rewrite_comprehension(Forms),
     case CompareWith of
         nocompare -> ok;
-        print -> io:format(erl_pp:expr(InstrumentedLc));
+        print -> io:format(lists:flatten(erl_pp:expr(InstrumentedLc)));
         map -> ok;
         map_c -> ok;
         _ -> ?assertEqual(CompareWith, lists:flatten(erl_pp:expr(InstrumentedLc)))
@@ -659,6 +662,8 @@ test_comprehension(Comprehension, CompareWith) ->
     {value, InstrumentedResult, #{}} = erl_eval:expr(InstrumentedLc, #{}),
     case CompareWith of
         map ->
+            true = is_list(Result),
+            true = is_list(InstrumentedResult),
             ?assertEqual(lists:sort(Result), lists:sort(InstrumentedResult));
         _ ->
             ?assertEqual(Result, InstrumentedResult)
