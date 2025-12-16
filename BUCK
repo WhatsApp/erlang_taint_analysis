@@ -17,7 +17,7 @@ load(
     "@prelude//erlang:erlang_toolchain.bzl",
     "erlang_parse_transform",
 )
-# @fb-only
+# @fb-only[end= ]: load("@waserver//buck2/whatsapp:erlang.bzl", "erlang_application", "erlang_tests")
 
 fb_native.export_file(
     name = "taint_models",
