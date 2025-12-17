@@ -19,7 +19,6 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(abstract_machine_proclet_SUITE).
--typing([eqwalizer]).
 
 -include_lib("assert/include/assert.hrl").
 

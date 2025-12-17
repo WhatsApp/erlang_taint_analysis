@@ -19,7 +19,6 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(abstract_machine_util_SUITE).
--typing([eqwalizer]).
 
 -include_lib("stdlib/include/assert.hrl").
 

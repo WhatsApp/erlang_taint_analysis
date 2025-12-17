@@ -19,7 +19,6 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(taint_gatherer_SUITE).
--typing([eqwalizer]).
 
 -include_lib("stdlib/include/assert.hrl").
 

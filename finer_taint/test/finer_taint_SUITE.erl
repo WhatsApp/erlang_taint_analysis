@@ -22,7 +22,6 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(finer_taint_SUITE).
--typing([eqwalizer]).
 
 -include_lib("common_test/include/ct.hrl").
 -include_lib("stdlib/include/assert.hrl").

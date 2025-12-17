@@ -19,7 +19,6 @@
 %%% @end
 %%% -------------------------------------------------------------------
 -module(message_passer_SUITE).
--typing([eqwalizer]).
 
 -include_lib("stdlib/include/assert.hrl").
 

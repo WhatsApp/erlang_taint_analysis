@@ -14,7 +14,6 @@
 % limitations under the License.
 
 -module(capture_out).
--typing([eqwalizer]).
 -export([capture_output/1]).
 -include_lib("kernel/include/logger.hrl").
 
