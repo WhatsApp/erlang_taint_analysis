@@ -14,12 +14,10 @@
 
 %%% % @format
 %%%-------------------------------------------------------------------
-%%% @doc
 %%%     Tests for finer taint analysis
 %%%
 %%%     They instrument an erlang file, run a function in the instrumented module,
 %%%     capture output and run it throught the abstract machine to get the leaks
-%%% @end
 %%% -------------------------------------------------------------------
 -module(finer_taint_SUITE).
 

@@ -14,13 +14,11 @@
 
 %%% % @format
 %%%-------------------------------------------------------------------
-%%% @doc
 %%%     Tests for finer taint analysis focusing on multi processing abilities
 %%%
 %%%     The tests are similar to finer_taint_SUITE, except that they use
 %%%     parallel_finer_taint instead pf ct_finer_taint
 %%%
-%%% @end
 %%% -------------------------------------------------------------------
 -module(parallel_taint_SUITE).
 
