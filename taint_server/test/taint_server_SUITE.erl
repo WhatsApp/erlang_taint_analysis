@@ -19,6 +19,7 @@
 -module(taint_server_SUITE).
 
 -include_lib("common_test/include/ct.hrl").
+% elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").
 
 %% Test server callbacks

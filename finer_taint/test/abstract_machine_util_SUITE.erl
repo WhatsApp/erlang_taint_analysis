@@ -18,6 +18,7 @@
 %%% -------------------------------------------------------------------
 -module(abstract_machine_util_SUITE).
 
+% elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").
 
 %% Test server callbacks
