@@ -17,7 +17,6 @@
     {description,
         "App containing servers for the taint app that need an external dependency. They cannot be part of the taint app, because the taint app needs to compile as a parse transform, which can't have dependencies"},
     {vsn, "0.1.0"},
-    {registered, []},
     {mod, {taint_server_app, []}},
     %% NOTE: Remember to sync changes to `applications` to
     %% the BUCK file in the application's base folder
