@@ -1018,6 +1018,7 @@ split_to_next_qualifier(Rest = [Head | Tail], Filters) ->
         {m_generate, _, _, _} ->
             {lists:reverse(Filters), Rest};
         _ ->
+            % eqwalizer:ignore incompatible_types needs a deeper fix for otp 28
             case erl_lint:is_guard_test(Head) of
                 true -> split_to_next_qualifier(Tail, [[Head] | Filters]);
                 _ -> {Filters, [Head | Tail]}
