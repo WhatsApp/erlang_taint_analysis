@@ -1017,6 +1017,14 @@ split_to_next_qualifier(Rest = [Head | Tail], Filters) ->
             {lists:reverse(Filters), Rest};
         {m_generate, _, _, _} ->
             {lists:reverse(Filters), Rest};
+        {generate_strict, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        {b_generate_strict, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        {m_generate_strict, _, _, _} ->
+            {lists:reverse(Filters), Rest};
+        {zip, _, _} ->
+            {lists:reverse(Filters), Rest};
         _ ->
             % eqwalizer:ignore incompatible_types needs a deeper fix for otp 28
             case erl_lint:is_guard_test(Head) of
@@ -1029,9 +1037,11 @@ split_to_next_qualifier(Rest = [Head | Tail], Filters) ->
 rewrite_qualifier([], Body, [RecursiveCall]) ->
     Anno = element(2, RecursiveCall),
     {cons, Anno, Body, RecursiveCall};
-rewrite_qualifier([Head = {generate, Anno, Pattern, ListExpr} | Tail0], Body, EmptyClauseBody) ->
+rewrite_qualifier([{GenType, Anno, Pattern, ListExpr} | Tail0], Body, EmptyClauseBody) when
+    GenType == generate; GenType == generate_strict
+->
     {Guards, Tail} = split_to_next_qualifier(Tail0, []),
-    Suffix = expr_hash(Head),
+    Suffix = expr_hash({generate, Anno, Pattern, ListExpr}),
     GenLc = list_to_atom("GenLc" ++ Suffix),
     GenLcVar = {var, Anno, GenLc},
     TailVar = {var, Anno, list_to_atom("GenlcTail" ++ Suffix)},
@@ -1044,22 +1054,33 @@ rewrite_qualifier([Head = {generate, Anno, Pattern, ListExpr} | Tail0], Body, Em
         ]},
     % GenLc([_ | TailVar]) -> GenLc(TailVar);
     FallbackClause = {clause, Anno, [{cons, Anno, {var, Anno, '_'}, TailVar}], [], [{call, Anno, GenLcVar, [TailVar]}]},
-    Clauses = [EmptyClause, MainClause, FallbackClause],
+    Clauses =
+        case GenType of
+            generate_strict -> [EmptyClause, MainClause];
+            generate -> [EmptyClause, MainClause, FallbackClause]
+        end,
     {call, Anno, {named_fun, Anno, GenLc, Clauses}, [ListExpr]};
 rewrite_qualifier(
     [
-        {m_generate, Anno, {map_field_exact, _Anno, K, V}, MapExpr}
+        {MGenType, Anno, {map_field_exact, _Anno, K, V}, MapExpr}
         | Tail0
     ],
     Body,
     EmptyClauseBody
-) ->
+) when MGenType == m_generate; MGenType == m_generate_strict ->
     ToListExpr = {call, Anno, {remote, Anno, ?ATOM(modeled_taint_maps), ?ATOM(to_list)}, [MapExpr]},
     TuplePattern = ?TUPLE([K, V]),
-    rewrite_qualifier([{generate, Anno, TuplePattern, ToListExpr} | Tail0], Body, EmptyClauseBody);
-rewrite_qualifier([Head = {b_generate, Anno, Pattern, BinaryExpr} | Tail0], Body, EmptyClauseBody) ->
+    GenType =
+        case MGenType of
+            m_generate -> generate;
+            m_generate_strict -> generate_strict
+        end,
+    rewrite_qualifier([{GenType, Anno, TuplePattern, ToListExpr} | Tail0], Body, EmptyClauseBody);
+rewrite_qualifier([{BGenType, Anno, Pattern, BinaryExpr} | Tail0], Body, EmptyClauseBody) when
+    BGenType == b_generate; BGenType == b_generate_strict
+->
     {Guards, Tail} = split_to_next_qualifier(Tail0, []),
-    Suffix = expr_hash(Head),
+    Suffix = expr_hash({b_generate, Anno, Pattern, BinaryExpr}),
     BinGenLc = list_to_atom("BinGenLc" ++ Suffix),
     BinGenLcVar = {var, Anno, BinGenLc},
     TailVar = {var, Anno, list_to_atom("BinGenLcTail" ++ Suffix)},
@@ -1075,8 +1096,43 @@ rewrite_qualifier([Head = {b_generate, Anno, Pattern, BinaryExpr} | Tail0], Body
     FallbackClause = {clause, Anno, [MainPattern], [], [{call, Anno, BinGenLcVar, [TailVar]}]},
     % GenLc(<<_>>) -> <EmptyClauseBody>;
     EmptyClause = {clause, Anno, [{bin, Anno, [TailSegment]}], [], EmptyClauseBody},
-    Clauses = [MainClause, FallbackClause, EmptyClause],
+    Clauses =
+        case BGenType of
+            b_generate_strict -> [MainClause, EmptyClause];
+            b_generate -> [MainClause, FallbackClause, EmptyClause]
+        end,
     {call, Anno, {named_fun, Anno, BinGenLc, Clauses}, [BinaryExpr]};
+% eqwalizer:fixme type fix not yet in release https://github.com/erlang/otp/pull/10040
+rewrite_qualifier([{zip, Anno, Generators} | Tail0], Body, EmptyClauseBody) ->
+    {Patterns, ListExprs} = lists:unzip([
+        case Gen of
+            {generate, _, P, E} ->
+                {P, E};
+            {generate_strict, _, P, E} ->
+                {P, E};
+            {b_generate, _, P, E} ->
+                {P, E};
+            {b_generate_strict, _, P, E} ->
+                {P, E};
+            {m_generate, _, {map_field_exact, _, K, V}, E} ->
+                ToListE = {call, Anno, {remote, Anno, ?ATOM(modeled_taint_maps), ?ATOM(to_list)}, [E]},
+                {?TUPLE([K, V]), ToListE};
+            {m_generate_strict, _, {map_field_exact, _, K, V}, E} ->
+                ToListE = {call, Anno, {remote, Anno, ?ATOM(modeled_taint_maps), ?ATOM(to_list)}, [E]},
+                {?TUPLE([K, V]), ToListE}
+        end
+     || Gen <- Generators
+    ]),
+    TuplePattern = ?TUPLE(Patterns),
+    ZippedExpr =
+        case ListExprs of
+            [E1, E2] ->
+                {call, Anno, {remote, Anno, ?ATOM(lists), ?ATOM(zip)}, [E1, E2]};
+            _ ->
+                ListOfLists = list_to_list_ast(Anno, ListExprs),
+                {call, Anno, {remote, Anno, ?ATOM(lists), ?ATOM(zip)}, [ListOfLists]}
+        end,
+    rewrite_qualifier([{generate_strict, Anno, TuplePattern, ZippedExpr} | Tail0], Body, EmptyClauseBody);
 rewrite_qualifier([BoolExpr | Tail], Body, EmptyClauseBody) ->
     Anno = element(2, lists:nth(1, EmptyClauseBody)),
     TrueClause = {clause, Anno, [?ATOM(true)], [], [rewrite_qualifier(Tail, Body, EmptyClauseBody)]},
