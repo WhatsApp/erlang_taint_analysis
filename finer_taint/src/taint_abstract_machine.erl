@@ -733,14 +733,14 @@ propagate({construct_pattern, {{map, Keys}, Loc}}, State = #taint_am_state{stack
                     end,
                 {MapValues, MapKeys} = lists:split(length(Keys), KeyValuesTaint),
                 % maps/merge will overwrite values from BaseTaintMap
-                ValueTaintMap = maps:merge(BaseTaintMap, maps:from_list(lists:zip(Keys, MapValues))),
+                ValueTaintMap = maps:merge(BaseTaintMap, #{K => V || K <- Keys && V <- MapValues}),
                 PreviousKeyTaintMap = maps:get(abstract_machine_mapkey_taints, BaseTaintMap, #{}),
                 KeyTaintMap =
                     if
                         is_map(PreviousKeyTaintMap) ->
                             maps:merge(
                                 PreviousKeyTaintMap,
-                                maps:from_list(lists:zip(Keys, MapKeys))
+                                #{K => V || K <- Keys && V <- MapKeys}
                             )
                     end,
                 MapValueBody = ValueTaintMap#{abstract_machine_mapkey_taints => KeyTaintMap},
