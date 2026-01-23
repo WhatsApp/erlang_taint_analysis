@@ -691,7 +691,8 @@ comprehension_transform(_Config) ->
     test_comprehension("[{X, Y} || X <:- [1,2,3], Y <:- [a,b,c]].", print),
     test_comprehension("[X || <<X:2>> <:= <<1:8,2:8,3:8>>].", print),
     test_comprehension("[A || A := _V <:- #{1 => a, 2 => b}].", map),
-    test_comprehension("[{X, Y} || X <- [1,2,3] && Y <- [a,b,c]].", print).
+    test_comprehension("[{X, Y} || X <- [1,2,3] && Y <- [a,b,c]].", print),
+    test_comprehension("[{X, Y} || X <:- [1,2,3] && Y <:- [a,b,c]].", print).
 
 nested_case_main(Config) ->
     Leaks = compile_and_run_function(Config, case_clauses, nested_case_with_call_main),
