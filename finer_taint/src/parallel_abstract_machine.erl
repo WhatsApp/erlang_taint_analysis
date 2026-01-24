@@ -61,7 +61,7 @@ run_impl(Filepaths, TaintMachineArgs) ->
     % Tell the proclets to start executing the file
     [
         abstract_machine_proclet:run_instructions_file(Pid, Fp)
-     || {Pid, Fp} <- lists:zip(Proclets, Filepaths)
+     || Pid <- Proclets && Fp <- Filepaths
     ],
     % Stop all proclets, thus telling them they won't get any new instructions
     abstract_machine_proclet_sup:stop_all_proclets(),
