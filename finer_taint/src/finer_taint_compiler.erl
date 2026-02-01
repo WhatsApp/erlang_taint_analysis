@@ -309,7 +309,7 @@ string_list_to_ast(Anno, List) ->
 -spec map_to_map_ast(erl_anno:anno(), map()) -> expr().
 map_to_map_ast(Anno, Map) ->
     Assocs = maps:fold(
-        fun(K, V, Acc) when is_atom(K) andalso is_atom(V) ->
+        fun(K, V, Acc) when is_atom(K), is_atom(V) ->
             [{map_field_assoc, Anno, ?ATOM(K), ?ATOM(V)} | Acc]
         end,
         [],
