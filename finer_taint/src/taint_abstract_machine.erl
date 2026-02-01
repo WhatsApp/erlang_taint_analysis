@@ -1120,7 +1120,7 @@ propagate(Instruction, State) ->
 -spec bit_pattern_take_value([bin_pattern_segment()], [taint_value()], [taint_value()]) ->
     [taint_value()].
 % There are no bytes left, we are done and return all the values matched
-bit_pattern_take_value([{Size, [binary]}], [], CurrentTaintValues) when Size =:= 0 orelse Size =:= default ->
+bit_pattern_take_value([{Size, [binary]}], [], CurrentTaintValues) when Size =:= 0; Size =:= default ->
     CurrentTaintValues;
 bit_pattern_take_value([], [], CurrentTaintValues) ->
     CurrentTaintValues;
