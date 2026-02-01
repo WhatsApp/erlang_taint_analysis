@@ -829,7 +829,7 @@ propagate(
 propagate(
     {deconstruct_pattern, {{cons}, _Loc}},
     State = #taint_am_state{stack = [H = {TaintValueType, _} | Stack]}
-) when TaintValueType =:= taint orelse TaintValueType =:= notaint ->
+) when TaintValueType =:= taint; TaintValueType =:= notaint ->
     State#taint_am_state{stack = [H, H] ++ Stack};
 %% Deconstructs a binary pattern. BinPattern is a list of Size/Tsl expressions
 %% that can be used to infer the segment size. Most of the heavy lifting
