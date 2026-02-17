@@ -14,7 +14,7 @@
 
 %% % @format
 %% Implements some sort of message queue for passing taint messages.
-%% The main idea is to block the get() operation untill the message becomes available
+%% The main idea is to block the get() operation until the message becomes available
 -module(taint_message_passer).
 -compile(warn_missing_spec_all).
 

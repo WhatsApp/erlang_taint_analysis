@@ -56,7 +56,7 @@
 -type lineage_point() :: {mfa(), integer()}.
 
 -type taint_source() ::
-    % arg_taint is similar to source, but it is not neccessarly the begining
+    % arg_taint is similar to source, but it is not necessarily the beginning
     % of taint_history. That is multiple arg_taint points can be found
     % in a single history
     {arg_taint, lineage_point()}

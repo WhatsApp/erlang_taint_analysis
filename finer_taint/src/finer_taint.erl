@@ -17,7 +17,7 @@
 %% The main point of this file is that we can change how the instructions are emitted easily
 %% by doing in directly in Erlang and not in the abstract forms.
 %%
-%% The actual writting of the instructions is done by implementing the write_instruction
+%% The actual writing of the instructions is done by implementing the write_instruction
 %% in a behaviour
 -module(finer_taint).
 -compile(warn_missing_spec_all).

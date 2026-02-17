@@ -60,7 +60,7 @@ init([]) ->
                 id => Id,
                 restart => transient,
                 % The workers might take a long time to finish processing all messages
-                % and writting instructions to disk, so give a generous timeout to
+                % and writing instructions to disk, so give a generous timeout to
                 % prevent forcefully killing them
                 shutdown => 50000,
                 start =>
