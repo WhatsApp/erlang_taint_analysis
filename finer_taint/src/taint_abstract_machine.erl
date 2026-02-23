@@ -429,11 +429,11 @@ append_taint_history_base({pattern_taint, map, MapVal}, HistoryPoint) when is_ma
     ),
     {pattern_taint, map, NewMapVal};
 append_taint_history_base({pattern_taint, tuple, PatternVals}, HistoryPoint) when is_list(PatternVals) ->
-    {pattern_taint, tuple, lists:map(fun(V) -> append_taint_history_base(V, HistoryPoint) end, PatternVals)};
+    {pattern_taint, tuple, [append_taint_history_base(V, HistoryPoint) || V <:- PatternVals]};
 append_taint_history_base({pattern_taint, cons, PatternVals}, HistoryPoint) when is_list(PatternVals) ->
-    {pattern_taint, cons, lists:map(fun(V) -> append_taint_history_base(V, HistoryPoint) end, PatternVals)};
+    {pattern_taint, cons, [append_taint_history_base(V, HistoryPoint) || V <:- PatternVals]};
 append_taint_history_base({pattern_taint, {bitstring, Bs}, PatternVals}, HistoryPoint) when is_list(PatternVals) ->
-    {pattern_taint, {bitstring, Bs}, lists:map(fun(V) -> append_taint_history_base(V, HistoryPoint) end, PatternVals)};
+    {pattern_taint, {bitstring, Bs}, [append_taint_history_base(V, HistoryPoint) || V <:- PatternVals]};
 append_taint_history_base({taint, History}, HistoryPoint) ->
     {taint, [HistoryPoint | History]}.
 
@@ -696,7 +696,7 @@ propagate({construct_pattern, {{bitstring, BinValSizes}, Loc}}, State = #taint_a
             true ->
                 {notaint, []};
             _ ->
-                BinTaintVals1 = lists:map(fun(V) -> append_taint_history(V, Loc) end, lists:reverse(BinTaintVals)),
+                BinTaintVals1 = [append_taint_history(V, Loc) || V <:- lists:reverse(BinTaintVals)],
                 {pattern_taint, {bitstring, BinValSizes}, BinTaintVals1}
         end,
     State#taint_am_state{stack = [BinaryTaintValue | NewStack]};
@@ -760,7 +760,7 @@ propagate({construct_pattern, {{tuple, Arity}, Loc}}, State = #taint_am_state{st
                 {notaint, []};
             %%Otherwise we construct the tuple
             _ ->
-                TupleValues1 = lists:map(fun(V) -> append_taint_history(V, Loc) end, TupleValues),
+                TupleValues1 = [append_taint_history(V, Loc) || V <:- TupleValues],
                 {pattern_taint, tuple, TupleValues1}
         end,
     State#taint_am_state{stack = [TaintValue | NewStack]};
@@ -809,7 +809,7 @@ propagate(
     {deconstruct_pattern, {{tuple, Arity}, Loc}},
     State = #taint_am_state{stack = [{pattern_taint, tuple, TupleValues} | Stack]}
 ) when Arity == length(TupleValues) ->
-    TupleValues1 = lists:map(fun(V) -> append_taint_history(V, Loc) end, TupleValues),
+    TupleValues1 = [append_taint_history(V, Loc) || V <:- TupleValues],
     State#taint_am_state{stack = lists:reverse(TupleValues1, Stack)};
 %% Deconstructing a tuple  pattern when top of stack is tainted
 propagate(
@@ -841,14 +841,14 @@ propagate(
     NewTopStack =
         case TopStack of
             {notaint, []} ->
-                lists:map(fun(_) -> {notaint, []} end, BinPattern);
+                [{notaint, []} || _ <:- BinPattern];
             {pattern_taint, {bitstring, Sizes}, BinVals} ->
                 [append_taint_history(Val, Loc) || Val <- match_binary_pattern({Sizes, BinVals}, BinPattern)];
             {try_enter, _} ->
                 error(bad_taint_value);
             Val = {_Source, _History} ->
                 NewTaint = append_taint_history(taint_value(Val), Loc),
-                lists:map(fun(_) -> NewTaint end, BinPattern)
+                [NewTaint || _ <:- BinPattern]
         end,
     State#taint_am_state{stack = lists:reverse(NewTopStack, Stack)};
 propagate(
@@ -1222,10 +1222,7 @@ try_enter_predicate(TryBlockId) ->
     [taint_value()].
 match_binary_pattern({Sizes, BinVals}, BinPatterns) ->
     TaintValuesAtByte = lists:append(
-        lists:map(
-            fun({Size, BinVal}) -> [BinVal || _ <- lists:seq(1, Size)] end,
-            lists:zip(Sizes, BinVals)
-        )
+        [[BinVal || _ <- lists:seq(1, Size)] || {Size, BinVal} <:- lists:zip(Sizes, BinVals)]
     ),
     bit_pattern_take_value(BinPatterns, TaintValuesAtByte, []).
 

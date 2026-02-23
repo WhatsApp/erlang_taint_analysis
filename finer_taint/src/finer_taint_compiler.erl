@@ -240,7 +240,7 @@ rewrite(
     State,
     Acc
 ) when not is_map_key({State#rewrite_state.module, Function}, ?DO_NOT_INSTRUMENT) ->
-    Clauses1 = lists:map(fun(Clause) -> instrument_function_clause(Clause, Function, State) end, Clauses0),
+    Clauses1 = [instrument_function_clause(Clause, Function, State) || Clause <:- Clauses0],
     FunctionForm = {function, L, Function, Arity, Clauses1},
     rewrite(
         Rest,
@@ -303,7 +303,7 @@ list_to_list_ast(Anno, [H | T]) ->
 
 -spec string_list_to_ast(erl_anno:anno(), list()) -> expr().
 string_list_to_ast(Anno, List) ->
-    ListOfStrings = lists:map(fun(String) -> {string, Anno, lists:flatten(io_lib:format("~s", [String]))} end, List),
+    ListOfStrings = [{string, Anno, lists:flatten(io_lib:format("~s", [String]))} || String <:- List],
     list_to_list_ast(Anno, ListOfStrings).
 
 -spec map_to_map_ast(erl_anno:anno(), map()) -> expr().
@@ -720,7 +720,7 @@ instrument_expression({'fun', Anno, {clauses, FuncClauses}}, State) ->
         lists:flatten(io_lib:format("lambda_~p_~p_~p_anon", [State#rewrite_state.module, L, Col]))
     ),
     VarsInLambda = get_all_variable_names(FuncClauses),
-    Clauses1 = lists:map(fun(Clause) -> instrument_function_clause(Clause, Function, State) end, FuncClauses),
+    Clauses1 = [instrument_function_clause(Clause, Function, State) || Clause <:- FuncClauses],
     {
         [?EMIT_INSTR(Anno, capture_closure, [string_list_to_ast(Anno, VarsInLambda)])],
         {'fun', Anno, {clauses, Clauses1}},
@@ -737,7 +737,7 @@ instrument_expression({named_fun, Anno, Name, FuncClauses}, State) ->
             io_lib:format("lambda_~p_~p_~p_named_~s", [State#rewrite_state.module, L, Col, atom_to_list(Name)])
         )
     ),
-    Clauses1 = lists:map(fun(Clause) -> instrument_function_clause(Clause, Function, State) end, FuncClauses),
+    Clauses1 = [instrument_function_clause(Clause, Function, State) || Clause <:- FuncClauses],
     VarsInLambda = get_all_variable_names(FuncClauses),
     {
         [

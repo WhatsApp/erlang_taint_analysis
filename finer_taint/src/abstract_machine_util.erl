@@ -440,7 +440,7 @@ query_arg_lineage_impl(
         HistoryFolder([Step = {Type, _, _} | Tail1], PathTo) when Type =/= joined_history ->
             HistoryFolder(Tail1, [Step | PathTo]);
         HistoryFolder([{joined_history, _, Histories}], PathTo) ->
-            lists:concat(lists:map(fun(Hist) -> HistoryFolder(Hist, PathTo) end, Histories))
+            lists:concat([HistoryFolder(Hist, PathTo) || Hist <:- Histories])
     end(
         Froms, [{arg_leak, {ToMFA, ToArgN}}]
     ),
@@ -565,7 +565,7 @@ to_infer_report([], Acc) ->
     Acc;
 to_infer_report([{leak, Sink, History} | Tail], Acc) ->
     LinearHistories = linearize_history(History),
-    BugReports = lists:map(fun(Hist) -> to_infer_bug_report(Hist, Sink) end, LinearHistories),
+    BugReports = [to_infer_bug_report(Hist, Sink) || Hist <:- LinearHistories],
     to_infer_report(Tail, BugReports ++ Acc).
 
 -spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) -> map().
@@ -607,8 +607,8 @@ to_dot({Nodes, Edges}) ->
     end,
     {NodeToLabel, NodeDecls} = maps:fold(F, {#{}, ""}, Nodes),
 
-    Body = lists:map(
-        fun({From, To}) -> io_lib:format("~s -> ~s;~n", [maps:get(From, NodeToLabel), maps:get(To, NodeToLabel)]) end,
-        Edges
-    ),
+    Body = [
+        io_lib:format("~s -> ~s;~n", [maps:get(From, NodeToLabel), maps:get(To, NodeToLabel)])
+     || {From, To} <:- Edges
+    ],
     lists:flatten(io_lib:format("digraph taintflow {~s~s}", [NodeDecls, Body])).
