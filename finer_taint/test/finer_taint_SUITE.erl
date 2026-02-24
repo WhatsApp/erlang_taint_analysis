@@ -152,7 +152,7 @@ compile(Modules, Config) ->
         io:format("~p~n", [Forms]),
         {Mod, Forms}
     end,
-    lists:map(CompileMod, Modules) ++ Config.
+    [CompileMod(Elem) || Elem <:- Modules] ++ Config.
 
 compile_and_load(Config, Module) ->
     [{_, Forms} | _] = compile([Module], Config),

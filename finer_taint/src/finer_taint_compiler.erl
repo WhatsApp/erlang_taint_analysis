@@ -921,12 +921,12 @@ instrument_pattern({bin, Anno, BinValues}, State) ->
                     {default, _} ->
                         ?TUPLE([
                             ?ATOM(default),
-                            list_to_list_ast(Anno, lists:map(TslToAst, Tsl))
+                            list_to_list_ast(Anno, [TslToAst(Elem) || Elem <:- Tsl])
                         ]);
                     {_, default} ->
                         ?TUPLE([Size, ?ATOM(default)]);
                     {_Size, _Tsl} ->
-                        ?TUPLE([Size, list_to_list_ast(Anno, lists:map(TslToAst, Tsl))])
+                        ?TUPLE([Size, list_to_list_ast(Anno, [TslToAst(Elem) || Elem <:- Tsl])])
                 end,
             GatherSizeTsl(Tail, {AccExpr ++ ExprInstr, AccSizes ++ [Size1]})
     end,

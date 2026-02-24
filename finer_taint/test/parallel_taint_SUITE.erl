@@ -112,7 +112,7 @@ compile(Modules, Config) ->
         io:format("~p~n", [Forms]),
         {Mod, Forms}
     end,
-    lists:map(CompileMod, Modules) ++ Config.
+    [CompileMod(Elem) || Elem <:- Modules] ++ Config.
 
 replace_undeterministic(Binary) ->
     Opts = [{return, binary}, global],
