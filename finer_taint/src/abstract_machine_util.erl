@@ -532,7 +532,7 @@ linearize_history([Item | Tail]) when
 ->
     [[Item | H] || H <- linearize_history(Tail)];
 linearize_history([{joined_history, _, Histories}]) ->
-    lists:append([linearize_history(H) || H <- Histories]).
+    [X || H <- Histories, X <- linearize_history(H)].
 
 -spec to_infer_bug_report(taint_abstract_machine:taint_history(), string()) -> infer_report().
 to_infer_bug_report(History, Sink) ->
