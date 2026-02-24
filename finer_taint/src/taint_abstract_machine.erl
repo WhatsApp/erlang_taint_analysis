@@ -471,7 +471,7 @@ get_tainted_args({notaint, []}) ->
 get_tainted_args({pattern_taint, map, MapVals}) ->
     lists:flatten(maps:fold(fun map_value_lineage_folder/3, [], MapVals));
 get_tainted_args({pattern_taint, _Type, PatternVals}) ->
-    lists:flatten(lists:map(fun get_tainted_args/1, PatternVals));
+    lists:flatten([get_tainted_args(V) || V <- PatternVals]);
 get_tainted_args({lambda_closure, _History}) ->
     [];
 get_tainted_args({taint, History}) ->
@@ -880,7 +880,7 @@ propagate(
                         {pattern_taint, tuple, lists:reverse(TupleValues1)}
                 end;
             {taint, _} ->
-                {taint, [{joined_history, pattern, lists:map(fun get_history/1, [TupleTaint, ValueTaintV])}]};
+                {taint, [{joined_history, pattern, [get_history(T) || T <- [TupleTaint, ValueTaintV]]}]};
             {pattern_taint, tuple, TupleValues} ->
                 TupleValues1 = setnth(Index, lists:reverse(TupleValues), ValueTaintV),
                 {pattern_taint, tuple, lists:reverse(TupleValues1)}
@@ -1234,7 +1234,7 @@ propagate_taints_for_models(Args) ->
         [OneTaintedArg] ->
             OneTaintedArg;
         TaintedArgs ->
-            {taint, [{joined_history, model, lists:map(fun get_history/1, TaintedArgs)}]}
+            {taint, [{joined_history, model, [get_history(T) || T <- TaintedArgs]}]}
     end.
 
 -spec setnth(non_neg_integer(), [A], A) -> [A].

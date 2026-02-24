@@ -373,7 +373,7 @@ call_fun(Loc, CallbackModule, Module, Function, Arity) ->
 
 -spec construct_pattern(string(), atom(), taint_abstract_machine:construct_pattern_types()) -> ok.
 construct_pattern(Loc, CallbackModule, {map, Keys}) ->
-    FilteredKeys = lists:map(fun pid_to_str/1, Keys),
+    FilteredKeys = [pid_to_str(K) || K <- Keys],
     CallbackModule:write_instruction({construct_pattern, {{map, FilteredKeys}, create_taint_value(Loc)}}),
     ok;
 construct_pattern(Loc, CallbackModule, Pattern) ->

@@ -532,7 +532,7 @@ linearize_history([Item | Tail]) when
 ->
     [[Item | H] || H <- linearize_history(Tail)];
 linearize_history([{joined_history, _, Histories}]) ->
-    lists:append(lists:map(fun linearize_history/1, Histories)).
+    lists:append([linearize_history(H) || H <- Histories]).
 
 -spec to_infer_bug_report(taint_abstract_machine:taint_history(), string()) -> infer_report().
 to_infer_bug_report(History, Sink) ->
@@ -550,7 +550,7 @@ to_infer_bug_report(History, Sink) ->
         line => list_to_integer(Line),
         procedure => <<"unknown">>,
         procedure_start_line => list_to_integer(Line),
-        bug_trace => lists:map(fun to_infer_bug_trace/1, OtherSteps),
+        bug_trace => [to_infer_bug_trace(S) || S <- OtherSteps],
         key => list_to_binary(io_lib:format("~p->~s", [Source, Sink]))
     },
     Report#{hash => base64:encode(crypto:hash(sha256, io_lib:format("~p", [Report])))}.
