@@ -402,12 +402,7 @@ append_taint_history(Value, Loc) ->
 -spec append_taint_history_base(taint_value(), taint_history_point()) -> taint_value().
 
 append_taint_history_base({lambda_closure, ScopesMap}, HistoryPoint) ->
-    NewScopesMap = maps:map(
-        fun(_K, V) ->
-            append_taint_history_base(V, HistoryPoint)
-        end,
-        ScopesMap
-    ),
+    NewScopesMap = #{K => append_taint_history_base(V, HistoryPoint) || K := V <- ScopesMap},
 
     {lambda_closure, NewScopesMap};
 append_taint_history_base(T = {notaint, _}, _HistoryPoint) ->
