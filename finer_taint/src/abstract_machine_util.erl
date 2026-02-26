@@ -568,7 +568,8 @@ to_infer_report([{leak, Sink, History} | Tail], Acc) ->
     BugReports = [to_infer_bug_report(Hist, Sink) || Hist <:- LinearHistories],
     to_infer_report(Tail, BugReports ++ Acc).
 
--spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) -> map().
+-spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) ->
+    #{level := 0, filename := binary(), line_number := integer(), column_number := -1, description := binary()}.
 to_infer_bug_trace({step, Location}) ->
     {Filename, Line} =
         case get_file_path(Location) of
