@@ -82,7 +82,7 @@
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             finds_simple_taint,
             extract_pattern,
             calling_convention,

@@ -48,7 +48,7 @@ suite() ->
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             first_set_then_get,
             first_get_then_set,
             message_after_timeout,

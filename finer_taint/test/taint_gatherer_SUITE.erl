@@ -35,7 +35,7 @@
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             can_gather_leaks,
             waits_for_leaks
         ]}

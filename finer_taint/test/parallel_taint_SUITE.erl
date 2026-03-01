@@ -55,7 +55,7 @@ suite() ->
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             two_pids,
             spawn_taint_transfer,
             spawn_taint_transfer_via_capture,

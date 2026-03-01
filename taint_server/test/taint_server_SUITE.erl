@@ -39,7 +39,7 @@ suite() ->
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             can_write_parallel_instructions_to_file
         ]}
     ].

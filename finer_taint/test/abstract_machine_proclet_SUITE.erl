@@ -36,7 +36,7 @@
 
 groups() ->
     [
-        {basic, [], [
+        {basic, [
             message_pass_between_proclets,
             runs_some_instructions
         ]}
