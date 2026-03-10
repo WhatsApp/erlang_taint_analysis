@@ -49,13 +49,14 @@ all() ->
 models_cfg_is_correct(_Config) ->
     Models = abstract_machine_util:get_priv_models(),
     ?assertMatch(#{{'operators', 'div'} := propagate}, Models),
-    maps:foreach(
-        fun(MF, Action) ->
+    [
+        begin
             ?assertMatch({M, F} when is_atom(M) and is_atom(F), MF),
             ?assert(Action =:= propagate orelse Action =:= sanitize)
-        end,
-        Models
-    ).
+        end
+     || MF := Action <- Models
+    ],
+    ok.
 
 can_get_dataflows(_Config) ->
     TaintHistory = [
