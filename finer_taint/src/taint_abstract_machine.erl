@@ -1217,7 +1217,7 @@ try_enter_predicate(TryBlockId) ->
     [taint_value()].
 match_binary_pattern({Sizes, BinVals}, BinPatterns) ->
     TaintValuesAtByte = lists:append(
-        [[BinVal || _ <- lists:seq(1, Size)] || {Size, BinVal} <:- lists:zip(Sizes, BinVals)]
+        [[BinVal || _ <- lists:seq(1, Size)] || Size <:- Sizes && BinVal <:- BinVals]
     ),
     bit_pattern_take_value(BinPatterns, TaintValuesAtByte, []).
 
