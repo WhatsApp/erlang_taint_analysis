@@ -259,9 +259,7 @@ run_tracing(Filepath) ->
     run(
         Filepath,
         fun(Instruction, State) ->
-            io:format("~s executing ~p~n~p~n==========~n", [
-                Basename, Instruction, State
-            ]),
+            io:format("~s executing ~p~n~p~n==========~n", [Basename, Instruction, State]),
             propagate(Instruction, State)
         end,
         #taint_am_state{}
@@ -1057,9 +1055,10 @@ propagate(
     {push_scope, {{_Module, PushedFunction, Arity}, _Loc}},
     State = #taint_am_state{scopes = Scope, instrumented_return = [{CalledFunction, _} | _], stack = Stack}
 ) ->
-    io:format("Expected ~p, but got into ~p, assuming ~p is uninstrumented and it called ~p~n", [
-        CalledFunction, PushedFunction, CalledFunction, PushedFunction
-    ]),
+    io:format(
+        "Expected ~p, but got into ~p, assuming ~p is uninstrumented and it called ~p~n",
+        [CalledFunction, PushedFunction, CalledFunction, PushedFunction]
+    ),
     %Note lineage mode
     State#taint_am_state{
         scopes = [#{} | Scope],

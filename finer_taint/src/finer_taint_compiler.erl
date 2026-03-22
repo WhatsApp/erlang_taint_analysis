@@ -1089,9 +1089,7 @@ rewrite_qualifier([{BGenType, Anno, Pattern, BinaryExpr} | Tail0], Body, EmptyCl
     {bin, _, Segments} = Pattern,
     MainPattern = {bin, Anno, lists:append(Segments, [TailSegment])},
     MainClause =
-        {clause, Anno, [MainPattern], Guards, [
-            rewrite_qualifier(Tail, Body, [{call, Anno, BinGenLcVar, [TailVar]}])
-        ]},
+        {clause, Anno, [MainPattern], Guards, [rewrite_qualifier(Tail, Body, [{call, Anno, BinGenLcVar, [TailVar]}])]},
     % GenLc(<<_ | TailVar>>) -> GenLc(TailVar);
     FallbackClause = {clause, Anno, [MainPattern], [], [{call, Anno, BinGenLcVar, [TailVar]}]},
     % GenLc(<<_>>) -> <EmptyClauseBody>;

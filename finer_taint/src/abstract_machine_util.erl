@@ -334,9 +334,10 @@ get_arg_lineage(Leaks, OutputFormat) ->
                 "FromM,FromF,FromA,FromArgN,ToM,ToF,ToA,ToArgN,Annot\n"
                 | [
                     [
-                        io_lib:format("~p,~p,~p,~p,~p,~p,~p,~p,~s~n", [
-                            FromM, FromF, FromA, FromArgN, ToM, ToF, ToA, ToArgN, Annot
-                        ])
+                        io_lib:format(
+                            "~p,~p,~p,~p,~p,~p,~p,~p,~s~n",
+                            [FromM, FromF, FromA, FromArgN, ToM, ToF, ToA, ToArgN, Annot]
+                        )
                      || Annot <- annotations(maps:get(K, FoldedMessagesLineage))
                     ]
                  || K = {{{FromM, FromF, FromA}, FromArgN}, {{ToM, ToF, ToA}, ToArgN}} := _ <- FoldedMessagesLineage

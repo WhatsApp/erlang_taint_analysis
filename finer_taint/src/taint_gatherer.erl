@@ -111,9 +111,10 @@ handle_info(
     if
         TimeSinceLastAddedLeaks > WaitTime ->
             RemainingPids = RequestedProcletPids -- AlreadyAddedProcPids,
-            ?LOG_WARNING("Gather_leaks timeout, skipping ~p proclets, dead proclets: ~p~n", [
-                length(RemainingPids), [Pid || Pid <- RemainingPids, is_pid(Pid) andalso not is_process_alive(Pid)]
-            ]),
+            ?LOG_WARNING(
+                "Gather_leaks timeout, skipping ~p proclets, dead proclets: ~p~n",
+                [length(RemainingPids), [Pid || Pid <- RemainingPids, is_pid(Pid) andalso not is_process_alive(Pid)]]
+            ),
             gen_server:reply(ReplyTo, Leaks),
             {noreply, State};
         AllPidsAlreadyAdded ->

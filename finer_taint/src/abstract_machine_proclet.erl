@@ -165,9 +165,7 @@ execute_instruction_impl(Instruction, State) ->
             ?LOG_WARNING("~p pid failed on  ~p in state ~n", [self(), Instruction]),
             taint_machine_crash;
         Exception:Reason:StackTrace ->
-            ?LOG_WARNING("Proclet ~p crashed with ~p ~p~n~p~n", [
-                self(), Exception, Reason, StackTrace
-            ]),
+            ?LOG_WARNING("Proclet ~p crashed with ~p ~p~n~p~n", [self(), Exception, Reason, StackTrace]),
             taint_machine_crash
     end.
 
