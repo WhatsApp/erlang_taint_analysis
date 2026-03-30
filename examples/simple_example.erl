@@ -1,3 +1,4 @@
+%%% @format
 % Copyright (c) Meta Platforms, Inc. and affiliates.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
@@ -21,6 +22,6 @@
 
 -spec simple_example_main() -> ok.
 simple_example_main() ->
-  TaintedVal = finer_taint:source("test"),
-  finer_taint:sink(TaintedVal),
-  io:format("Done!~n").
+    TaintedVal = finer_taint:source("test"),
+    finer_taint:sink(TaintedVal),
+    io:format("Done!~n").

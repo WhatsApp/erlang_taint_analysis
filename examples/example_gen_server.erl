@@ -1,3 +1,4 @@
+%%% @format
 % Copyright (c) Meta Platforms, Inc. and affiliates.
 %
 % Licensed under the Apache License, Version 2.0 (the "License");
@@ -40,32 +41,30 @@ other_id_function(X) -> X.
 
 -spec gen_server_main(term()) -> ok.
 gen_server_main(String) ->
-  io:format("Started ~p ~n", [ok]),
-  {ok, Pid} = example_gen_server:start_link(),
-  try
-    TaintedVal = finer_taint:source(String),
-    finer_taint:sink(TaintedVal),
-    finer_taint:sink(example_gen_server:store_value(Pid, TaintedVal)),
-    finer_taint:sink(example_gen_server:store_value(Pid, id_function(43))),
-    finer_taint:sink(other_id_function(example_gen_server:pop(Pid))),
-    PoppedValue = example_gen_server:pop(Pid),
-    finer_taint:sink(PoppedValue),
-    io:format("Gen server returned ~p~n", [PoppedValue])
-  after
-    example_gen_server:stop(Pid)
-  end.
-
+    io:format("Started ~p ~n", [ok]),
+    {ok, Pid} = example_gen_server:start_link(),
+    try
+        TaintedVal = finer_taint:source(String),
+        finer_taint:sink(TaintedVal),
+        finer_taint:sink(example_gen_server:store_value(Pid, TaintedVal)),
+        finer_taint:sink(example_gen_server:store_value(Pid, id_function(43))),
+        finer_taint:sink(other_id_function(example_gen_server:pop(Pid))),
+        PoppedValue = example_gen_server:pop(Pid),
+        finer_taint:sink(PoppedValue),
+        io:format("Gen server returned ~p~n", [PoppedValue])
+    after
+        example_gen_server:stop(Pid)
+    end.
 
 %% ======= GEN SERVER IMPL =============
 
 -spec start_link() -> gen_server:start_ret().
 start_link() ->
-  gen_server:start_link(?MODULE, [], []).
+    gen_server:start_link(?MODULE, [], []).
 
 -spec start_link(term(), term()) -> gen_server:start_ret().
 start_link(TaintedVal, NotTaintedVal) ->
-  gen_server:start_link(?MODULE, [TaintedVal, NotTaintedVal], []).
-
+    gen_server:start_link(?MODULE, [TaintedVal, NotTaintedVal], []).
 
 -spec store_value(pid(), term()) -> term().
 store_value(Pid, Value) ->
@@ -82,8 +81,8 @@ stop(Pid) ->
 -spec init([]) -> {ok, state()}.
 init([]) -> {ok, []}.
 
--spec handle_call(Msg, gen_server:from(), state()) -> {reply, term(), state()} | {stop, normal, ok, state()}
-  when Msg :: {store, term()} | pop | terminate.
+-spec handle_call(Msg, gen_server:from(), state()) -> {reply, term(), state()} | {stop, normal, ok, state()} when
+    Msg :: {store, term()} | pop | terminate.
 handle_call({store, Value}, _From, State) ->
     {reply, Value, [Value | State]};
 handle_call(pop, _From, [Head | Tail]) ->
