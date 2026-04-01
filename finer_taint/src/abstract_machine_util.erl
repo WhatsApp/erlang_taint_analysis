@@ -523,13 +523,10 @@ linearize_history(X = [{tagged_source, _Tag, _Location}]) ->
 linearize_history(X = [{source, _Location}]) ->
     [X];
 linearize_history([Item | Tail]) when
-    is_map_key(element(1, Item), #{
-        step => 1,
-        call_site => 1,
-        return_site => 1,
-        message_pass => 1,
-        blackhole => 1
-    })
+    is_map_key(
+        element(1, Item),
+        #{step => 1, call_site => 1, return_site => 1, message_pass => 1, blackhole => 1}
+    )
 ->
     [[Item | H] || H <- linearize_history(Tail)];
 linearize_history([{joined_history, _, Histories}]) ->
