@@ -51,7 +51,7 @@ all() ->
 %% TEST CASES
 
 can_write_parallel_instructions_to_file(Config) ->
-    PrivDir = ?config(priv_dir, Config),
+    PrivDir = proplists:get_value(priv_dir, Config),
     AbstrInstructionPrefix = filename:join(PrivDir, "abstr-instr-tpid"),
     application:set_env(taint_server, instructions_stream_prefix, AbstrInstructionPrefix),
     application:start(taint_server),

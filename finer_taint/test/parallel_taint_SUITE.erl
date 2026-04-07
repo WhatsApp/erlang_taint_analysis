@@ -93,7 +93,7 @@ end_per_suite(_Config) ->
     ok.
 
 init_per_testcase(TestCase, Config) ->
-    DataDir = ?config(priv_dir, Config),
+    DataDir = proplists:get_value(priv_dir, Config),
     FileName = filename:join(DataDir, atom_to_list(TestCase) ++ "_analaysis_instr"),
     application:set_env(taint_server, instructions_stream_prefix, FileName),
     UpdatedConfig = wa_test_init:ensure_all_started(Config, taint_server),
@@ -103,7 +103,7 @@ end_per_testcase(_TestCase, _Config) ->
     ok.
 
 compile(Modules, Config) ->
-    DataDir = ?config(data_dir, Config),
+    DataDir = proplists:get_value(data_dir, Config),
     CompileMod = fun(Mod) ->
         ModFilename = [_ | _] = unicode:characters_to_list(io_lib:format("~p.erl", [Mod])),
         ModPath = filename:join([DataDir, ModFilename]),
@@ -140,7 +140,7 @@ compile_and_run_function(Config, Module, Func) ->
     application:stop(taint_server),
     FilenamePrefix = proplists:get_value(analysis_instr, Config),
     AnalysisInstrFiles = filelib:wildcard(FilenamePrefix ++ "-*"),
-    DataDir = ?config(data_dir, Config),
+    DataDir = proplists:get_value(data_dir, Config),
     Verbosity = ct:get_verbosity(default),
     {Status, RepoRoot} = file:read_file("/tmp/erlang_taint_root"),
     GeneratedHeader = <<"{push,{\"@ge", "nerated\"}}.\n{pop,{}}.\n">>,
@@ -328,7 +328,7 @@ test_gen_server(Config) ->
     FullLeaks = parallel_abstract_machine:run_lineage_with_line_history(AnalysisInstrFiles),
     FullLineage = abstract_machine_util:get_arg_lineage(FullLeaks, human_readable),
     ?assertEqual(FullLineage, ReducedLineage),
-    Fixture = filename:join(?config(data_dir, Config), "lineage_example_gen_server"),
+    Fixture = filename:join(proplists:get_value(data_dir, Config), "lineage_example_gen_server"),
     {ok, <<"@gen", "erated\n", _FixtureLineage/binary>>} = file:read_file(Fixture),
     %Note: this assert doesn't work accross OTP versions
     %For now let's just check there is some lineage
@@ -337,7 +337,7 @@ test_gen_server(Config) ->
     application:stop(taint_server),
 
     % Escript test
-    EscriptOutputFile = filename:join(?config(data_dir, Config), "escript_output_file.lineage"),
+    EscriptOutputFile = filename:join(proplists:get_value(data_dir, Config), "escript_output_file.lineage"),
     run_finer_taint_escript:main(
         ["run-lineage"] ++ AnalysisInstrFiles ++ ["-arg-lineage-hr", "-to-file", EscriptOutputFile]
     ),

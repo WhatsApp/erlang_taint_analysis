@@ -142,7 +142,7 @@ end_per_suite(_Config) ->
     ok.
 
 compile(Modules, Config) ->
-    DataDir = ?config(data_dir, Config),
+    DataDir = proplists:get_value(data_dir, Config),
     CompileMod = fun(Mod) ->
         ModFilename = lists:flatten(io_lib:format("~p.erl", [Mod])),
         ModPath = filename:join([DataDir, ModFilename]),
@@ -164,7 +164,7 @@ compile_and_load(Config, Module) ->
     ?assertNotException(error, function_clause, erl_expand_records:module(InstrumentedForms, [debug_info])),
     io:format("~p: ~n~s~n", [Module, erl_prettypr:format(erl_syntax:form_list(InstrumentedForms))]),
     {ok, Module, Binary = <<_/binary>>} = compile:forms(InstrumentedForms, [debug_info]),
-    DataDir = ?config(data_dir, Config),
+    DataDir = proplists:get_value(data_dir, Config),
     code:add_patha(DataDir),
     BeamFileName = lists:flatten(io_lib:format("~p.beam", [Module])),
     BeamPath = filename:join(DataDir, BeamFileName),
@@ -211,7 +211,7 @@ assert_instruction_stream_equal(Expected, Actual) ->
     ?assertEqual(Replace(Expected), Replace(Actual)).
 
 get_instr_fixture_filename(Config, Func) ->
-    DataDir = ?config(data_dir, Config),
+    DataDir = proplists:get_value(data_dir, Config),
     filename:join(DataDir, io_lib:format("~p_analysis_instr", [Func])).
 
 run_lineage_analysis(Config, Func) ->
@@ -602,7 +602,9 @@ joining_model(Config) ->
     ?assertEqual(["modeled_functions.erl:31", "modeled_functions.erl:30"], abstract_machine_util:get_sources(History)).
 
 i13n_to_not_i13n_to_i13n(Config) ->
-    UnmodeledFilePath = io_lib:format("~s/not_instrumented/not_instrumented.erl", [?config(data_dir, Config)]),
+    UnmodeledFilePath = io_lib:format("~s/not_instrumented/not_instrumented.erl", [
+        proplists:get_value(data_dir, Config)
+    ]),
     {ok, not_instrumented} = c:c(UnmodeledFilePath),
     Leaks = compile_and_run_function(Config, i13n_to_not_i13n_to_i13n, i13n_to_not_i13n_to_i13n_main),
     [{leak, SecondSink, SecondHistory}, {leak, FirstSink, FirstHistory}] = Leaks,
@@ -612,7 +614,9 @@ i13n_to_not_i13n_to_i13n(Config) ->
     ?assertEqual("i13n_to_not_i13n_to_i13n.erl:37", SecondSink).
 
 modeled_functions(Config) ->
-    UnmodeledFilePath = io_lib:format("~s/not_instrumented/definetly_not_modeled.erl", [?config(data_dir, Config)]),
+    UnmodeledFilePath = io_lib:format("~s/not_instrumented/definetly_not_modeled.erl", [
+        proplists:get_value(data_dir, Config)
+    ]),
     {ok, definetly_not_modeled} = c:c(UnmodeledFilePath),
     Leaks = compile_and_run_function(Config, modeled_functions, modeled_functions_main),
     [{leak, Sink, History}] = Leaks,
