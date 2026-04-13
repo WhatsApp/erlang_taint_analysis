@@ -19,6 +19,8 @@ load(
 )
 # @fb-only[end= ]: load("@waserver//buck2/whatsapp:erlang.bzl", "erlang_application", "erlang_tests")
 
+oncall("whatsapp_server_devx")
+
 fb_native.export_file(
     name = "taint_models",
     src = "finer_taint/priv/models.cfg",
