@@ -283,7 +283,7 @@ get_temp_varname_for_expr(Expr, Prefix) ->
 unzip_flatten(List) ->
     unzip_flatten_impl(List, {[], [], []}).
 
--spec unzip_flatten_impl([{[T1], T2, [T3]}], {[T1 | [T1]], [T2], [T3 | [T3]]}) -> {[T1], [T2], [T3]}.
+-spec unzip_flatten_impl([{[T1], T2, [T3]}], {[[T1]], [T2], [[T3]]}) -> {[T1], [T2], [T3]}.
 unzip_flatten_impl([], {Pres, Exprs, Posts}) ->
     {lists:flatten(lists:reverse(Pres)), lists:reverse(Exprs), lists:flatten(lists:reverse(Posts))};
 unzip_flatten_impl([{Pres, Expr, Posts} | Tail], {AccPres, AccExpr, AccPosts}) ->
