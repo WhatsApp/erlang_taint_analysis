@@ -330,7 +330,7 @@ test_gen_server(Config) ->
     ?assertEqual(FullLineage, ReducedLineage),
     Fixture = filename:join(proplists:get_value(data_dir, Config), "lineage_example_gen_server"),
     {ok, <<"@gen", "erated\n", _FixtureLineage/binary>>} = file:read_file(Fixture),
-    %Note: this assert doesn't work accross OTP versions
+    %Note: this assert doesn't work across OTP versions
     %For now let's just check there is some lineage
     %?assertEqual(binary_to_list(FixtureLineage), Lineage),
     ?assert(length(ReducedLineage) > 100),
