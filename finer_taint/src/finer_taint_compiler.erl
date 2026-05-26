@@ -610,9 +610,9 @@ instrument_expression({call, Anno, {remote, _, Module, Func}, Args}, State) ->
     % length(Args) of arguments off it.
     %
     % In other words the only case where length(ReverseInstrumentedArgs1) =/= length(Args) is in the
-    % intrsinsic function case, where an erlang function is replaced by an abstract machine instruction.
-    % In that case the instrinsic should behave excatly the same as the original function. The fact that
-    % it also takes an additional CallbackModule arguments should be completly transparent.
+    % intrinsic function case, where an erlang function is replaced by an abstract machine instruction.
+    % In that case the intrinsic should behave exactly the same as the original function. The fact that
+    % it also takes an additional CallbackModule arguments should be completely transparent.
     {
         PreFunc1 ++ PreInstruments ++ [?EMIT_INSTR(Anno, call_fun, [Module1, Func2, ?INT(length(Args))])],
         {call, Anno, {remote, Anno, Module1, Func2}, lists:reverse(ReverseInstrumentedArgs1)},
