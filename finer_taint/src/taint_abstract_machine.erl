@@ -87,7 +87,7 @@
     | {return_site, mfa(), string()}
     % Represents a point in history of the taint value where the value
     % traveled outside of the instrumented code. Therefore we don't
-    % know what happned to it. In order to improve scalablity  we drop
+    % know what happened to it. In order to improve scalability we drop
     % the full history and just keep the taint sources that went into it
     % This is probably ok, because the full history is unknown anyway
     | {blackhole, [taint_source()]}
@@ -111,7 +111,7 @@
     | {pattern_taint, tuple, [taint_value()]}
     % the elements of the pattern are just put in a list in the same order
     | {pattern_taint, cons, [taint_value()]}
-    % The [number()] containts the byte sizes of taint values
+    % The [number()] contains the byte sizes of taint values
     | {pattern_taint, {bitstring, [number()]}, [taint_value()]}
     % For map #{Key => Value} the corresponding taint_value looks like
     % #{Key => Taint(Value), abstract_machine_mapkey_taints => #{Key => Taint(Value)}
@@ -212,7 +212,7 @@
     | {arg_dataflow, {mfa(), integer(), string()}, dataflow_map()}.
 -type leaks() :: [leak()].
 
-% Similar to {arg_taint, lineage_point()}, but also containts some taint_history
+% Similar to {arg_taint, lineage_point()}, but also contains some taint_history
 % that can be used for annotations. The taint history is usually not fully detailed
 -type annot_dataflow_src() :: {dataflow_src, lineage_point(), taint_history()}.
 % Each key in a map represent some dataflow from lineage_point() via taint_history()
@@ -445,7 +445,7 @@ map_value_lineage_folder(_, Value, Acc) when not is_map(Value) ->
     get_tainted_args(Value) ++ Acc.
 
 %% Traverses the history outputs a filtered history
-%% that only containts [{arg_taint, _}]
+%% that only contains [{arg_taint, _}]
 -spec extract_tainted_args(taint_history()) -> taint_history().
 extract_tainted_args(History) ->
     lists:filter(
