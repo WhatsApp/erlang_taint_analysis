@@ -148,7 +148,7 @@ compile_and_run_function(Config, Module, Func) ->
     case Module of
         % In the scatter_gather case we do not have fixtures because it
         % spawns more processes with the spawned process we have no way of
-        % controling the taint pids of the spawning process and its not worth
+        % controlling the taint pids of the spawning process and its not worth
         % the effort to implement that just for testing
         scatter_gather ->
             ok;
