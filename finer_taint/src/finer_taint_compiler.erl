@@ -358,7 +358,7 @@ expr_to_var(Expr) ->
 %% DoImportantInstrumentationStuff(),
 %% A = func_a(ATempVariableXyz).
 %%
-%% This kind of looks like transforming the code into some form of single static assigment (SSA),
+%% This kind of looks like transforming the code into some form of single static assignment (SSA),
 %% thus the name. It only does this when we need to insert some "post" instrumentation.
 -spec ssa_iffy(triple()) -> triple().
 ssa_iffy({Pre, Expr, []}) ->
