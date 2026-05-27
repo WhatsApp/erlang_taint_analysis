@@ -22,7 +22,7 @@
 
 %%====================================================================
 %% Escript that runs the finer taint abstract machine and
-%% produces useable outputs
+%% produces usable outputs
 %%====================================================================
 -type stack() :: [mfa()].
 
