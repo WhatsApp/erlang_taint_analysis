@@ -30,7 +30,7 @@
 
 %% tid() is similar to pid(), but it represent the id of the abstract machine executing
 %% an instruction stream for a particular process. In other words, where real processes
-%% are indentfied with pid(), "taint processes" are identfied with tid()
+%% are identified with pid(), "taint processes" are identified with tid()
 -type tid() :: integer().
 
 -type per_tid_state() :: file:io_device().
@@ -61,7 +61,7 @@ init([InstructionsFilePrefix]) ->
     % We trap the exit to ensure the messages in the queue get processed and not discarded
     % when an exit is initiated
     process_flag(trap_exit, true),
-    % This process is expected to receive a lot of messages, so this flag is improtant
+    % This process is expected to receive a lot of messages, so this flag is important
     % to keep good performance
     process_flag(message_queue_data, off_heap),
     {ok, #abstract_machine_server_state{filename = InstructionsFilePrefix, tid_state_map = #{}}}.

@@ -79,7 +79,7 @@ history_to_leakeage_evidence(Sink, History) ->
 -spec get_priv_models() -> taint_abstract_machine:models().
 get_priv_models() ->
     File = filename:join([code:priv_dir(finer_taint), "taint_models"]),
-    % Check atleast one element
+    % Check at least one element
     [H | T] =
         case file:consult(File) of
             {ok, Terms} ->
@@ -130,7 +130,7 @@ print_leaks([{leak, Sink, History} | Tail], Acc) ->
     print_leaks(Tail, Leaks ++ Acc).
 
 % Write the leaks to /tmp dir in the DOT format,
-% If second argument containt pastry, also upload it to pastry.
+% If second argument contains pastry, also upload it to pastry.
 %
 % Example usage:
 % abstract_machine_util:graphviz_leaks(Leak, [pastry]).
@@ -194,7 +194,7 @@ get_dataflows([_H = {joined_history, _Type, Histories}], ReturnStack, Output, Ar
     NewArgTaints = [get_dataflows(Hist, ReturnStack, Output, #{}) || Hist <- Histories],
     NewArgTaints1 = lists:foldl(fun maps:merge/2, ArgTaints, NewArgTaints),
     get_dataflows([], ReturnStack, Output, NewArgTaints1);
-%Done, put remaning call stack in Output and return
+%Done, put remaining call stack in Output and return
 get_dataflows([], _CallStack, _Output, ArgTaints) ->
     ArgTaints.
 
@@ -235,7 +235,7 @@ annotations_impl([{message_pass, Loc} | Tail]) ->
 annotations(Map) when is_map(Map) ->
     [string:join(annotations_impl(Annot), ";") || Annot := _ <- Map].
 
-% Filters out redudant message passes in a taint history For example
+% Filters out redundant message passes in a taint history For example
 % step1->step2->message_pass->step->message_pass->step3 would become
 % step1->step2->message_pass->step3 as the steps between message passing can be
 % skipped for the lineage use case. To illustrate that consider an edge A -> B.
@@ -469,7 +469,7 @@ get_sources(History) ->
     ).
 %
 % Builds a graph representation of a Leak. Use to_dot/0 to print it in the DOT format.
-% This graph is not equivalent to a trace. Namely it can containt cycles.
+% This graph is not equivalent to a trace. Namely it can contain cycles.
 -spec get_graph({leak, string(), taint_abstract_machine:taint_history()}) ->
     {nodes_ty(), edges_ty()}.
 get_graph({leak, Sink, History}) ->

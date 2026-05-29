@@ -179,11 +179,11 @@ push_scope(Loc, CallbackModule, Module, Function, Arity) ->
         % Which should have been passed to us as a message with ProcId
         {label, {new_proc, ProcId}} ->
             if
-                % Normaly the ProcPid is a string representation of ref()
+                % Normally the ProcPid is a string representation of ref()
                 % In that case we don't override the taint_pid and let it be randomyl generated
                 is_list(ProcId) ->
                     ok;
-                % If the parent process set next_taint_pid in process dictonary
+                % If the parent process set next_taint_pid in process dictionary
                 % It will end up in ProcId so we set the taint_pid here
                 true ->
                     put(taint_pid, ProcId)

@@ -146,7 +146,7 @@ process_dict(Pd) ->
     erlang:put(process_dict, Pd).
 
 % This is not instrumented so that parralel_taint_SUITE can put taint pids
-% in process dictonary
+% in process dictionary
 -spec real_put(term(), term()) -> undefined | term().
 real_put(Key, Value) ->
     erlang:put(Key, Value).

@@ -20,7 +20,7 @@
 -include_lib("kernel/include/logger.hrl").
 -export([run/1, run_tracing/1, run_lineage/1, run_tracing_lineage/1, run_lineage_with_line_history/1]).
 
-% Takes a list of filenames containg instruction streams.
+% Takes a list of filenames containing instruction streams.
 % Runs all the instructions and returns a list of leaks it found.
 % Leaks are returned in reverse order as they are found, but the
 % order might not be deterministic due to scheduling differences

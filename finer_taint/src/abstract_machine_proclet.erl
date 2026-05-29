@@ -87,7 +87,7 @@ init([Gatherer, InitStateArgs]) ->
     % when an exit is initiated
     process_flag(trap_exit, true),
     % This is a very important flag. The proclets can accumulate
-    % large ammount of messages in the queue, this makes GC of the process
+    % large amount of messages in the queue, this makes GC of the process
     % very expensive. This flag makes GC of the process with a long queue
     % cheap at the expense of making receiving messages a bit more expensive.
     process_flag(message_queue_data, off_heap),

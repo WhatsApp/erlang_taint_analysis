@@ -479,7 +479,7 @@ instrument_expression({'receive', Anno, ReceiveCaseClauses}, State) ->
 instrument_expression({'case', Anno, Expr, CaseClauses}, State) ->
     {PreExpr, Expr1, []} = ssa_iffy(instrument_expression(Expr, State)),
     InstrumentedClauses = [instrument_case_clause(C, [], State) || C <- CaseClauses],
-    % Since case has a body, it can't be executed at an arbirary point in expr tree,
+    % Since case has a body, it can't be executed at an arbitrary point in expr tree,
     % because stack isn't in a proper state. Therefore we replace it with a temp variable
     {TempVar, NewExpr} = expr_to_var({'case', Anno, Expr1, InstrumentedClauses}),
     {PreExpr ++ [NewExpr], TempVar, []};
@@ -496,7 +496,7 @@ instrument_expression({'maybe', Anno, Body}, State) ->
 instrument_expression({'maybe', Anno, Body, {'else', AnnoElse, ElseClauses}}, State) ->
     {_LastExpr, Body1} = instrument_body(Body, [], State),
     InstrumentedClauses = [instrument_case_clause(C, [], State) || C <- ElseClauses],
-    % Since maybe has a body, it can't be executed at an arbirary point in expr tree,
+    % Since maybe has a body, it can't be executed at an arbitrary point in expr tree,
     % because stack isn't in a proper state. Therefore we replace it with a temp variable
     {TempVar, NewExpr} = expr_to_var({'maybe', Anno, Body1, {'else', AnnoElse, InstrumentedClauses}}),
     {[NewExpr], TempVar, []};
@@ -538,7 +538,7 @@ instrument_expression(
 ) ->
     {[], Expr, [?EMIT_INSTR(Anno, push, [?NILL(Anno)])]};
 % Same as send, because we do not want to worry about timing in the taint world
-% Note: refactor implemntation to reuse the send code
+% Note: refactor implementation to reuse the send code
 instrument_expression(
     {call, Anno, {remote, _, {atom, _, erlang}, {atom, _, send_after}}, [Interval, Pid, Message | Tail]}, State
 ) ->
