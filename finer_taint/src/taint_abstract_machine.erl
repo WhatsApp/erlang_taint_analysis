@@ -97,10 +97,10 @@
 -type taint_value() ::
     % untainted value
     {notaint, []}
-    %A normal tainted values
+    % A normal tainted value
     | {taint, taint_history()}
-    % Represents a taint value of a function. The only function that
-    % can be tainted are lambdas, because they can containt captured
+    % Represents a taint value of a function. The only functions that
+    % can be tainted are lambdas, because they can contain captured
     % variables. {lambda_closure, Scope} stores all the captured
     % taint variables in the Scope. The scope needs to be restored
     % via restore_capture instruction when the function is called.
@@ -215,8 +215,8 @@
 % Similar to {arg_taint, lineage_point()}, but also contains some taint_history
 % that can be used for annotations. The taint history is usually not fully detailed
 -type annot_dataflow_src() :: {dataflow_src, lineage_point(), taint_history()}.
-% Each key in a map represent some dataflow from lineage_point() via taint_history()
-% taint_history() might be reduced. This is a map for dedpulication and efficency
+% Each key in a map represents some dataflow from lineage_point() via taint_history()
+% taint_history() might be reduced. This is a map for deduplication and efficiency
 -type dataflow_map() :: #{annot_dataflow_src() => ok}.
 -type leaks_map() :: #{leak() => ok}.
 
@@ -230,7 +230,7 @@
 % function_history -> run lineage mode containing only the history of arguments
 % Both lineage modes give the same lineage edges, however line_history mode enables
 % one to use `-query-arg-lineage' in run_lineage_escript to find the full history of an edge.
-% This is useful for debugging why and edge is reported
+% This is useful for debugging why an edge is reported
 -type lineage_mode() :: false | line_history | function_history | coverage.
 -type lineage_modules_denylist() :: #{module() => ok}.
 
@@ -565,9 +565,9 @@ propagate({receive_trace, {MsgId, Loc}}, State = #taint_am_state{stack = Stack})
     TaintMsg0 = taint_message_passer:blocking_get(MsgId),
     TaintMsg = append_taint_history(TaintMsg0, Loc),
     State#taint_am_state{stack = [TaintMsg | Stack]};
-% Pop a value ofthe stack and push a scope. If the popped value is a {lambda_closure, Scope},
+% Pop a value of the stack and push a scope. If the popped value is a {lambda_closure, Scope},
 % push Scope as the scope, otherwise push an empty scope. This function should be called
-% before a lambda is potentially executed, to setup the variables captured by the lambda
+% before a lambda is potentially executed, to set up the variables captured by the lambda
 propagate(
     {restore_capture, {{Module, Function, Arity}, Loc}},
     State = #taint_am_state{stack = [Capture | Stack], scopes = Vars}
@@ -593,7 +593,7 @@ propagate(
 % Therefore we only capture variables that are in the scope of the creator, which
 % are the variables captured by the lambda due to no shadowing assumption.
 % This is done to simplify the process as we don't have to statically determine
-% which varibale is captured and which is local to the lambda
+% which variable is captured and which is local to the lambda
 propagate({capture_closure, {VariableNames}}, State = #taint_am_state{stack = Stack, scopes = Vars}) ->
     LambdaCapture = lists:foldl(
         fun(VarName, Acc) ->
@@ -1083,7 +1083,7 @@ propagate(
         end,
 
     State#taint_am_state{scopes = [#{} | Scope], stack = StartingStack ++ Stack};
-%% Denotes function return. The top value ofhe stack should be the return value.
+%% Denotes function return. The top value of the stack should be the return value.
 %% This function only destroys the current scope as it is not needed anymore.
 %% sets the instrumented_return flag to be used by the {apply, ...} instruction
 propagate(
@@ -1159,7 +1159,7 @@ bit_pattern_take_value([{Size, [binary]} | PatternTail], [HeadByteTaintValue | T
         end,
     bit_pattern_take_value([{NewSize, [binary]} | PatternTail], Tail, [NewCurrentTaintValue | Others]).
 
-% This function crashes if the list doesn't containt only taint values
+% This function crashes if the list doesn't contain only taint values
 -spec is_all_taint_value([taint_value() | try_marker() | map()]) -> [taint_value()].
 is_all_taint_value([H = {lambda_closure, _} | T]) ->
     [H | is_all_taint_value(T)];
@@ -1270,7 +1270,7 @@ model_of(_, {string, 'slice', 3}, [String, _Start, _Length]) -> propagate_taints
 model_of(_, {string, 'concat', 2}, [String1, String2]) -> propagate_taints_for_models([String1, String2]);
 % maps:next/1 maps:iterator/1 should only be called in modeled_taint_maps, where the taint
 % is propagated manually, so the return value of maps needs to be untainted to destruct
-% into any tuple and be effecitvely discarded
+% into any tuple and be effectively discarded
 model_of(_, {maps, 'next', 1}, [_MapIterator]) -> {notaint, []};
 model_of(_, {maps, 'iterator', 1}, [_MapIterator]) -> {notaint, []};
 model_of(_, {crypto, 'hash', _}, _) -> {notaint, []};

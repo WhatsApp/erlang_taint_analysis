@@ -1,8 +1,7 @@
-
 # Instrumentation for finer-taint analysis
 
 This analysis is capable of tracking taint precisely through data transformations
-and is able to provide lineage data. 
+and is able to provide lineage data.
 
 ## Short guide to the code
 
@@ -46,7 +45,7 @@ tainted or not-tainted. The goal of instructions emitted by the instrumentation
 during execution of the program under test is to keep a relation between
 program and abstract machine executions. The two executions are essentially
 synchronise, with the abstract machine execution significantly simplified and
-only concerned about taint values. 
+only concerned about taint values.
 
 This analysis has two good properties:
 
@@ -61,14 +60,14 @@ run to produce the taint analysis result.
 
 The abstract machine is a stack machine operating on taint values. It has a
 stack of taint values and a variable store associating variable names to taint
-values.  
+values.
 
 ```
 type taint_value(): notaint | {taint, history()}
 ```
 
 A `taint_value` can either represent a value not tainted, or a tainted value with some history of where the value has been.
-For example a `{taint, ["sourcel.erl:2", "source.erl:1"]}` would indicate a tainted value was part of computation on line 1 in `source.erl` followed by some computation at line 2. 
+For example a `{taint, ["sourcel.erl:2", "source.erl:1"]}` would indicate a tainted value was part of computation on line 1 in `source.erl` followed by some computation at line 2.
 
 We are going to represent the abstract machine as a list representing the stack
 and a map representing the variable store ( `[], {}`). So an abstract machine
@@ -139,7 +138,7 @@ In this case `string:slice/3` is “non-instrumented” function, which means we
 haven’t instrumented the body of the function. This means we have to model the
 behaviour of `string:slice/3`. The analysis supports writing specific models
 for functions, but we also have a default model that considers the return value
-of a function tainted if any of the function arguments are tainted. 
+of a function tainted if any of the function arguments are tainted.
 
 For the cases where the body of the called functions is instrumented, the
 `apply` instruction is essentially a noop as the calling convention specifies
@@ -166,7 +165,7 @@ the emitted instructions represent the state of the abstract machine after
 executing that instruction.
 
 ```
-% AString = "123 is ...", 
+% AString = "123 is ...",
 push(notaint), % [notaint], {}
 store("AString"), % [], {AString: notaint}
 
@@ -175,7 +174,7 @@ push({taint, ["l2"]}), % [{taint, ["l2"]}], {AString: notaint}
 store("Number"), % [], {AString: notaint, Number: {taint, ["l2"]}}
 
 % X = slice(Number, 0, 3),
-push(notaint), % [notaint], {AString: notaint, Number: {taint, ["l2"]}} 
+push(notaint), % [notaint], {AString: notaint, Number: {taint, ["l2"]}}
 push(notaint), % [notaint,notaint], {AString: notaint, Number: {taint, ["l2"]}}
 get("Number"), % [{taint, ["l2"]}, notaint,notaint], {AString: notaint, Number: {taint, ["l2"]}}
 apply(string:slice/3), % [{taint, ["l3", "l2"]}], {AString: notaint, Number: {taint, ["l2"]}}
@@ -199,7 +198,7 @@ sink(), %Report data-flow! line2 -> line3 -> line6
 
 We start off by pushing `notaint` to top of the stack and storing it into
 variable `AString`, resulting in the abstract machine state `[], {AString:
-notaint}`. The same is done for storing the tainted value into `Number`. 
+notaint}`. The same is done for storing the tainted value into `Number`.
 
 Then we move on executing instructions that were emitted during execution of `X
 = slice(Number, 0, 3)`. We first push all the arguments to the stack, resulting
@@ -262,7 +261,7 @@ Binary comprehension are not supported at this time. They are assumed untainted
 ### Sockets
 
 Sockets are not supported, so they assume the default model. The arguments to the socket functions are likely untainted so
-the data read from the socket would be marked as not tainted. 
+the data read from the socket would be marked as not tainted.
 
 
 ### Try catch
@@ -300,8 +299,8 @@ Wrong or imprecise models impact the results of the analysis. There are three ki
   erlang implementation of their body, which is then instrumented with
   finer\_taint instrumentation. The most common case of this is NIFs, which we
   can't instrument directly, but it is easy to write their code in Erlang and
-  instrument that, which gives as their preciose behaviour. These models are
-  located unders `src/models`. Some implementation of functions are swapped by our
+  instrument that, which gives us their precise behaviour. These models are
+  located under `src/models`. Some implementation of functions are swapped by our
   instrumentation, which happens in [`intercepted_functions/1`](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/src/finer_taint_compiler.erl?lines=662)
 
 
@@ -315,8 +314,8 @@ should propagate taint or not:
 2. Does it make the analysis cheaper by killing taint, without compromising the result
 
 
-The first point is the most obivous/easy to justify as it just assumes an
-over-approximation. These models could also be dervied from static analysis.
+The first point is the most obvious/easy to justify as it just assumes an
+over-approximation. These models could also be derived from static analysis.
 For example for erlang:monitor, it's easy to see that its arguments do not flow
 into the return (it returns a random reference), but for string:concat it's
 obvious that all arguments form its output.
@@ -339,5 +338,3 @@ For example with erlang:function\_exported. There is a dataflow from its
 arguments (the module) to list of functions that are exported, but that will
 never be interesting to us, so it's just easier/faster to assume it's not
 tainted.
-
-
