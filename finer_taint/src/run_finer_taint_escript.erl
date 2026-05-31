@@ -76,7 +76,7 @@ main(_) ->
         "example_gen_server:store_value/2-Arg1 -> example_gen_server:handle_call/3-Arg2\n"
         "\n"
         "\n"
-        "EXMAPLES:\n"
+        "EXAMPLES:\n"
         "\n"
         "run_finer_taint run-lineage finer_taint/test/parallel_taint_SUITE_data/test_gen_server_an*  -query-arg-lineage \"example_gen_server:store_value/2-Arg1 -> example_gen_server:handle_call/3-Arg2\" -pprint\n"
         "\n"
