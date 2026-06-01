@@ -292,10 +292,10 @@ Wrong or imprecise models impact the results of the analysis. There are three ki
   assumes the output of the function is tainted iff any arguments are tainted.
 * *special uninstrumented models*, that is models whose body is not
   instrumented, but they are not handled as described above. Prime example of
-  this is `erlang:spawn*` familiy of functions, where taint is propagated in a
+  this is `erlang:spawn*` family of functions, where taint is propagated in a
   special way due to process creation. These are special cased in
   finer\_taint\_compiler.erl.
-* *instrumented_models*, that is functions that we model by writting a simple
+* *instrumented_models*, that is functions that we model by writing a simple
   erlang implementation of their body, which is then instrumented with
   finer\_taint instrumentation. The most common case of this is NIFs, which we
   can't instrument directly, but it is easy to write their code in Erlang and

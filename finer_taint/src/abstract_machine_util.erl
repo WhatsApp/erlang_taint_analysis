@@ -58,7 +58,7 @@ history_to_leakeage_evidence(Sink, History) ->
             [AnotherSource | Other] ->
                 io:format(
                     "History should be linear, expecting only a single source.~n" ++
-                        "Picking only one source, droping: ~p~n",
+                        "Picking only one source, dropping: ~p~n",
                     [Other]
                 ),
                 AnotherSource

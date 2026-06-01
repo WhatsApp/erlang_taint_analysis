@@ -30,7 +30,7 @@
 %   * is_* functions likely don't need a model, because they return boolean which isn't tainted
 %
 % binary_to_list/iolist_to_* and similar might need a model
-% if we want to accurantely track taint through these datastructures
+% if we want to accurately track taint through these data structures
 %
 
 -spec mapply(atom(), atom(), list()) -> term().

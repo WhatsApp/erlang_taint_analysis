@@ -269,7 +269,7 @@ rewrite([H | T], State, Acc) ->
 -define(SSA_PREFIX, "SSAify_").
 
 % Returns a hash of the passed Expr
-% Useful for creating unique identifiers somwehre in the abstract tree
+% Useful for creating unique identifiers somewhere in the abstract tree
 -spec expr_hash(term()) -> string().
 expr_hash(Expr) ->
     <<IntHash:256>> = crypto:hash(sha256, io_lib:format("~p", [Expr])),
