@@ -21,7 +21,7 @@ Is an escript that provides a nicer interface to run the abstract machine on the
 
 [finer\_taint\_SUITE.erl](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/test/finer_taint_SUITE.erl)
 is a test suite showing how analysis works on simple (non message passing related) erlang constructs. It can be useful
-to see how the analysis behaves on some easily degistable code. For example running [simple\_example.erl](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/test/finer_taint_SUITE_data/simple_example.erl?lines=1)
+to see how the analysis behaves on some easily digestible code. For example running [simple\_example.erl](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/test/finer_taint_SUITE_data/simple_example.erl?lines=1)
 produces [these instructions](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/test/finer_taint_SUITE_data/one_clause_analysis_instr).
 
 
