@@ -639,7 +639,7 @@ instrument_expression({call, Anno, Func, Args}, State) ->
         {call, Anno, Func1, lists:reverse(ReverseInstrumentedArgs)},
         [
             ?EMIT_INSTR(Anno, fun_apply, [?TUPLE([CurrentModule, FuncName, ?INT(length(Args))])]),
-            % Need to cleanup the scope we introdcued with restore_capture,
+            % Need to cleanup the scope we introduced with restore_capture,
             % reusing func_ret for this because it only drops the scope
             ?EMIT_INSTR(Anno, func_ret, [?ATOM(dropping_lambda_capture)])
         ]
