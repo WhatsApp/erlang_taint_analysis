@@ -675,7 +675,7 @@ propagate({sink, {Loc}}, State = #taint_am_state{stack = [TaintValue | Stack], l
                 stack = [TaintValue | Stack], leaks = [{leak, Loc, get_history(taint_value(TaintValue))} | Leaks]
             }
     end;
-% In lineage mode we are not interested in manally annotated sinks, so we just skip them
+% In lineage mode we are not interested in manually annotated sinks, so we just skip them
 propagate({sink, {_Loc}}, State = #taint_am_state{stack = [_ | _Stack]}) ->
     State;
 %% Constructs a binary pattern. BinValSizes is a list of runtime sizes (in bytes) of each segment that
