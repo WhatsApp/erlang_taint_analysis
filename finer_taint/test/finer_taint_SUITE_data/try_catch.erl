@@ -27,7 +27,7 @@ throwing_function(X) when X =:= 0 ->
   throw({foo, X});
 throwing_function(1) ->
   1 / finer_taint:source(0);
-throwing_function(X) when X > 0 andalso X rem 2 =:= 1 ->
+throwing_function(X) when X > 0, X rem 2 =:= 1 ->
   {odd, X + 1};
 throwing_function(_)  ->
   {even, 2}.
