@@ -19,7 +19,7 @@
 
 % This module should be equivalent to maps module
 % https://www.erlang.org/doc/man/maps.html .
-% Its used to implement all the functions in maps
+% It's used to implement all the functions in maps
 % that are otherwise implemented in C.
 
 -export([
@@ -194,7 +194,7 @@ fold_impl(Fun, Acc, MapIter, Map) ->
         none ->
             Acc;
         {IterKey, _Val, NextIter} ->
-            %We need to lookup the key again in order to "catch" the taint
+            % We need to lookup the key again in order to "catch" the taint
             #{IterKey := Value} = Map,
             fold_impl(Fun, Fun(IterKey, Value, Acc), NextIter, Map)
     end.
@@ -234,7 +234,7 @@ next({Map, Iterator}) ->
         none ->
             none;
         {RawKey, _Value, Iterator2} ->
-            %We need to lookup the key again in order to "catch" the taint
+            % We need to lookup the key again in order to "catch" the taint
             #{RawKey := Value} = Map,
             {RawKey, Value, {Map, Iterator2}}
     end.
