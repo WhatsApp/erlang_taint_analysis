@@ -112,7 +112,7 @@
     % the elements of the pattern are just put in a list in the same order
     | {pattern_taint, cons, [taint_value()]}
     % The [number()] contains the byte sizes of taint values
-    | {pattern_taint, {bitstring, [number()]}, [taint_value()]}
+    | {pattern_taint, {bitstring, [integer()]}, [taint_value()]}
     % For map #{Key => Value} the corresponding taint_value looks like
     % #{Key => Taint(Value), abstract_machine_mapkey_taints => #{Key => Taint(Value)}
     | {pattern_taint, map, #{term() => #{term() => taint_value()} | taint_value()}}.
@@ -131,13 +131,13 @@
     | pattern_types_shared().
 -type construct_pattern_types() ::
     % When constructing the bitstring pattern we pass in the byte sizes of each segment
-    {bitstring, [number()]}
+    {bitstring, [integer()]}
     | pattern_types_shared().
 -type pattern_types_shared() ::
     % map has a list of Keys
     {map, [string()]}
     % tuple has arity, ie the number of elements in the tuple
-    | {tuple, number()}
+    | {tuple, integer()}
     % Cons is always just a head and a tail
     | {cons}.
 

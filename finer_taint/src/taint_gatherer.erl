@@ -33,7 +33,7 @@
     leaks :: taint_abstract_machine:leaks_map(),
     reply_to = noone :: noone | {gen_server:from(), proc_pids()},
     % In native units
-    last_added_time :: number(),
+    last_added_time :: integer(),
     % List of pid() that have added a leak already
     proclet_pids = [] :: proc_pids()
 }).
@@ -67,7 +67,7 @@ start_link() ->
 init([]) ->
     {ok, #gatherer_state{leaks = #{}, last_added_time = erlang:monotonic_time()}}.
 
--spec handle_call({get_gathered_leaks, number(), proc_pids()}, gen_server:from(), state()) ->
+-spec handle_call({get_gathered_leaks, integer(), proc_pids()}, gen_server:from(), state()) ->
     {reply, term(), state()} | {stop, normal, ok, state()} | {noreply, state()}.
 handle_call(
     {get_gathered_leaks, WaitTime, RequestedProcletPids},
@@ -94,7 +94,7 @@ handle_call(
             {noreply, State#gatherer_state{reply_to = {From, RequestedProcletPids}}}
     end.
 
--spec handle_info({check_progress, number()}, state()) -> {noreply, state()}.
+-spec handle_info({check_progress, integer()}, state()) -> {noreply, state()}.
 % The {check_progress, WaitTime} is sent when a client is waiting for leaks to be gathered and is willing
 % to tollerate WaitTime milliseconds since the last leak was gathered
 handle_info(
