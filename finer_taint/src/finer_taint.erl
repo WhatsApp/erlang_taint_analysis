@@ -300,7 +300,7 @@ call_fun(Loc, CallbackModule, erlang, Function, Arity) when is_map_key(Function,
         case Function of
             %spawn_opt has second to last argument as Args
             spawn_opt -> max(0, ImaginaryArity - 3);
-            %All other spawn function have Args as last argument
+            %All other spawn functions have Args as last argument
             _ -> max(0, ImaginaryArity - 2)
         end,
 
