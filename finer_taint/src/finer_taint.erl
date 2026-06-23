@@ -180,7 +180,7 @@ push_scope(Loc, CallbackModule, Module, Function, Arity) ->
         {label, {new_proc, ProcId}} ->
             if
                 % Normally the ProcPid is a string representation of ref()
-                % In that case we don't override the taint_pid and let it be randomyl generated
+                % In that case we don't override the taint_pid and let it be randomly generated
                 is_list(ProcId) ->
                     ok;
                 % If the parent process set next_taint_pid in process dictionary
@@ -199,8 +199,8 @@ push_scope(Loc, CallbackModule, Module, Function, Arity) ->
             deconstruct_pattern(Loc, CallbackModule, {tuple, 2}),
             % We use the taint value of the function to restore the potential capture
             % This pushes a scope that is never popped. But in this case that is ok
-            % because the only time this scope needs to be popped is then the function
-            % getting spawned returns. At that point the process terminates too, so
+            % because the only time this scope needs to be popped is when the function
+            % being spawned returns. At that point the process terminates too, so
             % there is no further execution. Therefore we don't have to worry about
             % cleaning this scope
             CallbackModule:write_instruction({restore_capture, {{Module, Function, Arity}, create_taint_value(Loc)}}),
