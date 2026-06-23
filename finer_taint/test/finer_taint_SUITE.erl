@@ -201,7 +201,7 @@ compile_and_run_function(Config, Module, Func) ->
     taint_abstract_machine:get_leaks(State).
 
 % Compares live instruction stream with the one in fixture
-% accoutning for differences due to OTP versions
+% accounting for differences due to OTP versions
 assert_instruction_stream_equal(Expected, Actual) ->
     Replace = fun(Instructions) ->
         % GenLc<Suffix> variable names depend on a hash of a subexpression AST,
