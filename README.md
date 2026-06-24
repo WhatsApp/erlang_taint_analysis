@@ -1,8 +1,8 @@
 # A taint analysis for Erlang
 
 This repo contains a taint analysis for Erlang. It does not contain an
-off-the-shelf integration to use it. The analysis is setup to run on the
-examples, from which an inspiration for integration can be gained. For example
+off-the-shelf integration to use it. The analysis is set up to run on the
+examples, which can inspire an integration. For example
 the analysis could be run as part of running test by setting up hooks before
 and after running tests.
 
