@@ -96,7 +96,7 @@ handle_call(
 
 -spec handle_info({check_progress, integer()}, state()) -> {noreply, state()}.
 % The {check_progress, WaitTime} is sent when a client is waiting for leaks to be gathered and is willing
-% to tollerate WaitTime milliseconds since the last leak was gathered
+% to tolerate WaitTime milliseconds since the last leak was gathered
 handle_info(
     {check_progress, WaitTime},
     State = #gatherer_state{

@@ -247,7 +247,7 @@ annotations(Map) when is_map(Map) ->
 % Assume the annotation is `returnFromFoo, callBar`.
 %
 % What this annotation means is that our edge A -> B can only connect on the
-% left, with edges that have a callFoo annotation (or no annoatation).
+% left, with edges that have a callFoo annotation (or no annotation).
 % Similarly A -> B can only connect to the right with edges that have
 % returnFromBar annotation (or no annotation).
 %

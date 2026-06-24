@@ -18,7 +18,7 @@
 -moduledoc """
 Supervisor for abstract_machine_proclets
 
-Used to create new proclets and to tell them to stop
+Used to create new proclets and tell them to stop.
 """.
 -compile(warn_missing_spec_all).
 
@@ -55,7 +55,7 @@ init([AbstractMachineArgs]) ->
             % If the proclet dies, the state is lost, no point restarting, the analysis
             % of the process is dead anyway
             restart => temporary,
-            % Short shutdown as this supervisor can have a lot of proclets to shutdown
+            % Short shutdown as this supervisor can have a lot of proclets to shut down
             shutdown => 500
         }
     ],
