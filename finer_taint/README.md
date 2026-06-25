@@ -300,7 +300,7 @@ Wrong or imprecise models impact the results of the analysis. There are three ki
   finer\_taint instrumentation. The most common case of this is NIFs, which we
   can't instrument directly, but it is easy to write their code in Erlang and
   instrument that, which gives us their precise behaviour. These models are
-  located under `src/models`. Some implementation of functions are swapped by our
+  located under `src/models`. Some function implementations are swapped by our
   instrumentation, which happens in [`intercepted_functions/1`](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/src/finer_taint_compiler.erl?lines=662)
 
 
