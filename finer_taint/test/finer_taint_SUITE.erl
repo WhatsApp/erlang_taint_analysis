@@ -241,7 +241,7 @@ finds_simple_taint(Config) ->
 
 if_clause(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, simple_example, if_clause),
-    ?assertEqual(Sink, "simple_example.erl:33"),
+    ?assertEqual("simple_example.erl:33", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["simple_example.erl:29"]).
 
 lineage_annotations_merge_taint(Config) ->
@@ -267,35 +267,35 @@ lineage_annotations_merge_taint(Config) ->
 
 pattern_to_var(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, pattern_to_var),
-    ?assertEqual(Sink, "pattern_to_var.erl:26"),
+    ?assertEqual("pattern_to_var.erl:26", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:21"]).
 
 maybe_expr(Config) ->
     [{leak, Sink2, History2}, {leak, Sink, History}] = compile_and_run_function(
         Config, pattern_to_var, maybe_expr_main
     ),
-    ?assertEqual(Sink, "pattern_to_var.erl:88"),
+    ?assertEqual("pattern_to_var.erl:88", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:86"]),
-    ?assertEqual(Sink2, "pattern_to_var.erl:93"),
+    ?assertEqual("pattern_to_var.erl:93", Sink2),
     ?assertEqual(abstract_machine_util:get_sources(History2), ["pattern_to_var.erl:86", "pattern_to_var.erl:81"]).
 
 operators_in_pattern(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, operators_in_pattern_main),
-    ?assertEqual(Sink, "pattern_to_var.erl:65"),
+    ?assertEqual("pattern_to_var.erl:65", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:60"]).
 
 set_element(Config) ->
     [{leak, Sink2, History2}, {leak, Sink1, History1}] = compile_and_run_function(
         Config, pattern_to_var, set_element_main
     ),
-    ?assertEqual(Sink1, "pattern_to_var.erl:55"),
+    ?assertEqual("pattern_to_var.erl:55", Sink1),
     ?assertEqual(abstract_machine_util:get_sources(History1), ["pattern_to_var.erl:49"]),
-    ?assertEqual(Sink2, "pattern_to_var.erl:56"),
+    ?assertEqual("pattern_to_var.erl:56", Sink2),
     ?assertEqual(abstract_machine_util:get_sources(History2), ["pattern_to_var.erl:50"]).
 
 string_plusplus_pattern(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, string_plusplus_pattern),
-    ?assertEqual(Sink, "pattern_to_var.erl:45"),
+    ?assertEqual("pattern_to_var.erl:45", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:43"]).
 
 extract_pattern(Config) ->
@@ -307,7 +307,7 @@ extract_pattern(Config) ->
 nested_calls_main(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, nested_calls_main),
     [{leak, Sink, History}] = Leaks,
-    ?assertEqual(Sink, "function_calls.erl:69"),
+    ?assertEqual("function_calls.erl:69", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:68"]),
     ?assertEqual(
         [
@@ -328,7 +328,7 @@ nested_calls_main(Config) ->
 lambda_closures(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, lambda_closures_main),
     [{leak, Sink, History}] = Leaks,
-    ?assertEqual(Sink, "function_calls.erl:94"),
+    ?assertEqual("function_calls.erl:94", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:92"]),
     ?assertEqual(
         [
@@ -349,9 +349,9 @@ lambda_closures(Config) ->
 lambdas(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, lambdas_main),
     [{leak, Sink1, History1}, {leak, Sink, History}] = Leaks,
-    ?assertEqual(Sink, "function_calls.erl:75"),
+    ?assertEqual("function_calls.erl:75", Sink),
     ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:73"]),
-    ?assertEqual(Sink1, "function_calls.erl:83"),
+    ?assertEqual("function_calls.erl:83", Sink1),
     ?assertEqual(abstract_machine_util:get_sources(History1), ["function_calls.erl:73"]),
     ?assertEqual(
         [
@@ -376,7 +376,7 @@ calling_convention(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, calling_convention_main),
     ?assertEqual(length(Leaks), 1),
     [{leak, Sink, History}] = Leaks,
-    ?assertEqual(Sink, "function_calls.erl:26"),
+    ?assertEqual("function_calls.erl:26", Sink),
     ?assertEqual(History, [
         {step, "function_calls.erl:26"},
         {return_site, {function_calls, process_two_lists, 2}, "function_calls.erl:23"},
@@ -400,8 +400,8 @@ calling_convention(Config) ->
 recursion(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, recursion_main),
     [{leak, Sink2, _History}, {leak, Sink, History}] = Leaks,
-    ?assertEqual(Sink, "function_calls.erl:47"),
-    ?assertEqual(Sink2, "function_calls.erl:52"),
+    ?assertEqual("function_calls.erl:47", Sink),
+    ?assertEqual("function_calls.erl:52", Sink2),
     ?assertEqual(
         [
             {step, "function_calls.erl:47"},
