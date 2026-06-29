@@ -242,7 +242,7 @@ finds_simple_taint(Config) ->
 if_clause(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, simple_example, if_clause),
     ?assertEqual("simple_example.erl:33", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["simple_example.erl:29"]).
+    ?assertEqual(["simple_example.erl:29"], abstract_machine_util:get_sources(History)).
 
 lineage_annotations_merge_taint(Config) ->
     [] = compile_and_run_function(Config, simple_example, lineage_main),
@@ -268,47 +268,47 @@ lineage_annotations_merge_taint(Config) ->
 pattern_to_var(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, pattern_to_var),
     ?assertEqual("pattern_to_var.erl:26", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:21"]).
+    ?assertEqual(["pattern_to_var.erl:21"], abstract_machine_util:get_sources(History)).
 
 maybe_expr(Config) ->
     [{leak, Sink2, History2}, {leak, Sink, History}] = compile_and_run_function(
         Config, pattern_to_var, maybe_expr_main
     ),
     ?assertEqual("pattern_to_var.erl:88", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:86"]),
+    ?assertEqual(["pattern_to_var.erl:86"], abstract_machine_util:get_sources(History)),
     ?assertEqual("pattern_to_var.erl:93", Sink2),
-    ?assertEqual(abstract_machine_util:get_sources(History2), ["pattern_to_var.erl:86", "pattern_to_var.erl:81"]).
+    ?assertEqual(["pattern_to_var.erl:86", "pattern_to_var.erl:81"], abstract_machine_util:get_sources(History2)).
 
 operators_in_pattern(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, operators_in_pattern_main),
     ?assertEqual("pattern_to_var.erl:65", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:60"]).
+    ?assertEqual(["pattern_to_var.erl:60"], abstract_machine_util:get_sources(History)).
 
 set_element(Config) ->
     [{leak, Sink2, History2}, {leak, Sink1, History1}] = compile_and_run_function(
         Config, pattern_to_var, set_element_main
     ),
     ?assertEqual("pattern_to_var.erl:55", Sink1),
-    ?assertEqual(abstract_machine_util:get_sources(History1), ["pattern_to_var.erl:49"]),
+    ?assertEqual(["pattern_to_var.erl:49"], abstract_machine_util:get_sources(History1)),
     ?assertEqual("pattern_to_var.erl:56", Sink2),
-    ?assertEqual(abstract_machine_util:get_sources(History2), ["pattern_to_var.erl:50"]).
+    ?assertEqual(["pattern_to_var.erl:50"], abstract_machine_util:get_sources(History2)).
 
 string_plusplus_pattern(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, pattern_to_var, string_plusplus_pattern),
     ?assertEqual("pattern_to_var.erl:45", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["pattern_to_var.erl:43"]).
+    ?assertEqual(["pattern_to_var.erl:43"], abstract_machine_util:get_sources(History)).
 
 extract_pattern(Config) ->
     Leaks = compile_and_run_function(Config, pattern_to_var, extract_pattern),
     ?assertEqual(3, length(Leaks)),
     LeakedSinks = [Sink || {leak, Sink, _History} <- Leaks],
-    ?assertEqual(LeakedSinks, ["pattern_to_var.erl:38", "pattern_to_var.erl:37", "pattern_to_var.erl:32"]).
+    ?assertEqual(["pattern_to_var.erl:38", "pattern_to_var.erl:37", "pattern_to_var.erl:32"], LeakedSinks).
 
 nested_calls_main(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, nested_calls_main),
     [{leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:69", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:68"]),
+    ?assertEqual(["function_calls.erl:68"], abstract_machine_util:get_sources(History)),
     ?assertEqual(
         [
             {return_site, {function_calls, at, 2}, "function_calls.erl:69"},
@@ -329,7 +329,7 @@ lambda_closures(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, lambda_closures_main),
     [{leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:94", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:92"]),
+    ?assertEqual(["function_calls.erl:92"], abstract_machine_util:get_sources(History)),
     ?assertEqual(
         [
             {return_site, {function_calls, variable_func, 0}, "function_calls.erl:94"},
@@ -350,9 +350,9 @@ lambdas(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, lambdas_main),
     [{leak, Sink1, History1}, {leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:75", Sink),
-    ?assertEqual(abstract_machine_util:get_sources(History), ["function_calls.erl:73"]),
+    ?assertEqual(["function_calls.erl:73"], abstract_machine_util:get_sources(History)),
     ?assertEqual("function_calls.erl:83", Sink1),
-    ?assertEqual(abstract_machine_util:get_sources(History1), ["function_calls.erl:73"]),
+    ?assertEqual(["function_calls.erl:73"], abstract_machine_util:get_sources(History1)),
     ?assertEqual(
         [
             {step, "function_calls.erl:83"},
@@ -377,25 +377,28 @@ calling_convention(Config) ->
     ?assertEqual(1, length(Leaks)),
     [{leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:26", Sink),
-    ?assertEqual(History, [
-        {step, "function_calls.erl:26"},
-        {return_site, {function_calls, process_two_lists, 2}, "function_calls.erl:23"},
-        {return_site, {function_calls, concat_two_lists, 2}, "function_calls.erl:37"},
-        {return_site, {operators, '++', 2}, "function_calls.erl:34"},
-        {call_site, {operators, '++', 2}, "function_calls.erl:34"},
-        {step, "function_calls.erl:34"},
-        {call_site, {function_calls, concat_two_lists, 2}, "function_calls.erl:37"},
-        {step, "function_calls.erl:37"},
-        {return_site, {function_calls, append_to_list, 1}, "function_calls.erl:36"},
-        {return_site, {operators, '++', 2}, "function_calls.erl:30"},
-        {call_site, {operators, '++', 2}, "function_calls.erl:30"},
-        {step, "function_calls.erl:30"},
-        {call_site, {function_calls, append_to_list, 1}, "function_calls.erl:36"},
-        {step, "function_calls.erl:36"},
-        {call_site, {function_calls, process_two_lists, 2}, "function_calls.erl:23"},
-        {step, "function_calls.erl:23"},
-        {source, "function_calls.erl:22"}
-    ]).
+    ?assertEqual(
+        [
+            {step, "function_calls.erl:26"},
+            {return_site, {function_calls, process_two_lists, 2}, "function_calls.erl:23"},
+            {return_site, {function_calls, concat_two_lists, 2}, "function_calls.erl:37"},
+            {return_site, {operators, '++', 2}, "function_calls.erl:34"},
+            {call_site, {operators, '++', 2}, "function_calls.erl:34"},
+            {step, "function_calls.erl:34"},
+            {call_site, {function_calls, concat_two_lists, 2}, "function_calls.erl:37"},
+            {step, "function_calls.erl:37"},
+            {return_site, {function_calls, append_to_list, 1}, "function_calls.erl:36"},
+            {return_site, {operators, '++', 2}, "function_calls.erl:30"},
+            {call_site, {operators, '++', 2}, "function_calls.erl:30"},
+            {step, "function_calls.erl:30"},
+            {call_site, {function_calls, append_to_list, 1}, "function_calls.erl:36"},
+            {step, "function_calls.erl:36"},
+            {call_site, {function_calls, process_two_lists, 2}, "function_calls.erl:23"},
+            {step, "function_calls.erl:23"},
+            {source, "function_calls.erl:22"}
+        ],
+        History
+    ).
 
 recursion(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, recursion_main),
