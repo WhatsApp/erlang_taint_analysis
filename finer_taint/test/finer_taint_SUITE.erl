@@ -300,7 +300,7 @@ string_plusplus_pattern(Config) ->
 
 extract_pattern(Config) ->
     Leaks = compile_and_run_function(Config, pattern_to_var, extract_pattern),
-    ?assertEqual(length(Leaks), 3),
+    ?assertEqual(3, length(Leaks)),
     LeakedSinks = [Sink || {leak, Sink, _History} <- Leaks],
     ?assertEqual(LeakedSinks, ["pattern_to_var.erl:38", "pattern_to_var.erl:37", "pattern_to_var.erl:32"]).
 
@@ -374,7 +374,7 @@ lambdas(Config) ->
 
 calling_convention(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, calling_convention_main),
-    ?assertEqual(length(Leaks), 1),
+    ?assertEqual(1, length(Leaks)),
     [{leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:26", Sink),
     ?assertEqual(History, [
