@@ -1215,9 +1215,8 @@ try_enter_predicate(TryBlockId) ->
 -spec match_binary_pattern({[integer()], [taint_value()]}, [bin_pattern_segment()]) ->
     [taint_value()].
 match_binary_pattern({Sizes, BinVals}, BinPatterns) ->
-    TaintValuesAtByte = lists:append(
-        [[BinVal || _ <- lists:seq(1, Size)] || Size <:- Sizes && BinVal <:- BinVals]
-    ),
+    TaintValuesAtByte =
+        [BinVal || Size <:- Sizes && BinVal <:- BinVals, _ <- lists:seq(1, Size)],
     bit_pattern_take_value(BinPatterns, TaintValuesAtByte, []).
 
 -spec propagate_taints_for_models([taint_value()]) -> taint_value().
