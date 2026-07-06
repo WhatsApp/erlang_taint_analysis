@@ -13,13 +13,15 @@
 % limitations under the License.
 
 %%% % @format
-%%% This module is used to collect various "leaks" (dataflows) that
-%%% are detected while a taint_abstract_machine is executed on an
-%%% instruction stream. parallel_abstract_machine is an example
-%%% of how this module is meant to be used.
 -module(taint_gatherer).
 
 -compile(warn_missing_spec_all).
+-moduledoc """
+This module is used to collect various "leaks" (dataflows) that
+are detected while a taint_abstract_machine is executed on an
+instruction stream. parallel_abstract_machine is an example
+of how this module is meant to be used.
+""".
 
 -behaviour(gen_server).
 

@@ -13,9 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%% Runs multiple instructions streams exchanging messages
 -module(parallel_abstract_machine).
 -compile(warn_missing_spec_all).
+-moduledoc """
+Runs multiple instructions streams exchanging messages
+""".
 
 -include_lib("kernel/include/logger.hrl").
 -export([run/1, run_tracing/1, run_lineage/1, run_tracing_lineage/1, run_lineage_with_line_history/1]).
