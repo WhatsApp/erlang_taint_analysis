@@ -42,18 +42,18 @@ other_id_function(X) -> X.
 -spec gen_server_main(term()) -> ok.
 gen_server_main(String) ->
     io:format("Started ~p ~n", [ok]),
-    {ok, Pid} = example_gen_server:start_link(),
+    {ok, Pid} = ?MODULE:start_link(),
     try
         TaintedVal = finer_taint:source(String),
         finer_taint:sink(TaintedVal),
-        finer_taint:sink(example_gen_server:store_value(Pid, TaintedVal)),
-        finer_taint:sink(example_gen_server:store_value(Pid, id_function(43))),
-        finer_taint:sink(other_id_function(example_gen_server:pop(Pid))),
-        PoppedValue = example_gen_server:pop(Pid),
+        finer_taint:sink(?MODULE:store_value(Pid, TaintedVal)),
+        finer_taint:sink(?MODULE:store_value(Pid, id_function(43))),
+        finer_taint:sink(other_id_function(?MODULE:pop(Pid))),
+        PoppedValue = ?MODULE:pop(Pid),
         finer_taint:sink(PoppedValue),
         io:format("Gen server returned ~p~n", [PoppedValue])
     after
-        example_gen_server:stop(Pid)
+        ?MODULE:stop(Pid)
     end.
 
 %% ======= GEN SERVER IMPL =============

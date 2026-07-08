@@ -147,7 +147,7 @@ with(Ks, Map) ->
 with_impl([], _Map, Acc) ->
     Acc;
 with_impl([Key | Tail], Map, Acc) ->
-    case modeled_taint_maps:get(Key, Map, notfound) of
+    case ?MODULE:get(Key, Map, notfound) of
         notfound -> with_impl(Tail, Map, Acc);
         Value -> with_impl(Tail, Map, Acc#{Key => Value})
     end.
@@ -201,7 +201,7 @@ fold_impl(Fun, Acc, MapIter, Map) ->
 
 -spec is_key(Key, #{Key => term()}) -> boolean().
 is_key(Key, Map) ->
-    try modeled_taint_maps:get(Key, Map) of
+    try ?MODULE:get(Key, Map) of
         _ -> true
     catch
         error:{badmatch, _} -> false
@@ -213,13 +213,13 @@ new() ->
 
 -spec update_with(term(), fun((term()) -> term()), map()) -> map().
 update_with(Key, Fun, Map) ->
-    Val = modeled_taint_maps:get(Key, Map),
+    Val = ?MODULE:get(Key, Map),
     Map#{Key => Fun(Val)}.
 
 -spec update_with(term(), fun((term()) -> term()), term(), map()) ->
     map().
 update_with(Key, Fun, Init, Map) ->
-    case modeled_taint_maps:get(Key, Map, notthere) of
+    case ?MODULE:get(Key, Map, notthere) of
         notthere -> Map#{Key => Init};
         Val -> Map#{Key => Fun(Val)}
     end.
