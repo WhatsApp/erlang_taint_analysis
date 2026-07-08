@@ -22,6 +22,7 @@
 
 %% Test server callbacks
 -export([
+    suite/0,
     all/0,
     init_per_suite/1,
     end_per_suite/1,
@@ -41,6 +42,9 @@ groups() ->
             runs_some_instructions
         ]}
     ].
+
+suite() ->
+    [{procmop, #{cleanup_procs => true}}].
 
 all() ->
     [{group, basic}].
