@@ -51,7 +51,7 @@
 ]).
 
 suite() ->
-    [{appatic, #{enable_autoclean => true}}].
+    [].
 
 groups() ->
     [
