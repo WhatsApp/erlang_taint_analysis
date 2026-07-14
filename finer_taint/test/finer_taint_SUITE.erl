@@ -714,5 +714,6 @@ macro_duplicator(Config) ->
     ?assertEqual("simple_example.erl:56", Sink),
     ?assertEqual(["simple_example.erl:53"], abstract_machine_util:get_sources(History)).
 
+-spec suite() -> [ct_suite:ct_info()].
 suite() ->
-    [{procmop, #{cleanup_procs => true}}].
+    [].

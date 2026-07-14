@@ -197,5 +197,6 @@ can_balance_call_ret_with_joined_message_pass(_Config) ->
         maps:keys(abstract_machine_util:get_dataflows(TaintHistory))
     ).
 
+-spec suite() -> [ct_suite:ct_info()].
 suite() ->
-    [{procmop, #{cleanup_procs => true}}].
+    [].

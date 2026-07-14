@@ -80,5 +80,6 @@ waits_for_leaks(_Config) ->
     gen_server:stop(Pid),
     ?assertEqual(#{{leak, "loc", []} => ok}, RecLeaks).
 
+-spec suite() -> [ct_suite:ct_info()].
 suite() ->
-    [{procmop, #{cleanup_procs => true}}].
+    [].
