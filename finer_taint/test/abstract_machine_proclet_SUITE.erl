@@ -43,8 +43,11 @@ groups() ->
         ]}
     ].
 
+%% erlfmt:ignore
 suite() ->
-    [{procmop, #{cleanup_procs => true}}].
+    [
+        % @fb-only: {procmop, #{cleanup_procs => true}}
+    ].
 
 all() ->
     [{group, basic}].
