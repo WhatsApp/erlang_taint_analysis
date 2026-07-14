@@ -35,7 +35,7 @@
 ]).
 
 suite() ->
-    [].
+    [{procmop, #{cleanup_procs => true}}].
 
 groups() ->
     [

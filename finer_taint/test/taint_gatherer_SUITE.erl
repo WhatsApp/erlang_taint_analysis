@@ -18,6 +18,8 @@
 %%% -------------------------------------------------------------------
 -module(taint_gatherer_SUITE).
 
+-export([suite/0]).
+
 % elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").
 
@@ -77,3 +79,6 @@ waits_for_leaks(_Config) ->
         end,
     gen_server:stop(Pid),
     ?assertEqual(#{{leak, "loc", []} => ok}, RecLeaks).
+
+suite() ->
+    [{procmop, #{cleanup_procs => true}}].

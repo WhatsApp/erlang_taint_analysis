@@ -18,6 +18,8 @@
 %%% -------------------------------------------------------------------
 -module(abstract_machine_util_SUITE).
 
+-export([suite/0]).
+
 % elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").
 
@@ -194,3 +196,6 @@ can_balance_call_ret_with_joined_message_pass(_Config) ->
         ],
         maps:keys(abstract_machine_util:get_dataflows(TaintHistory))
     ).
+
+suite() ->
+    [{procmop, #{cleanup_procs => true}}].

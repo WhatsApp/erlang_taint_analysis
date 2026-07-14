@@ -44,7 +44,7 @@ suite() ->
     % The tests in this suite shouldn't take a long time,
     % but if there is a bug, they could block forever, so
     % we set a generous but short timeout
-    [{timetrap, {seconds, 10}}].
+    [{timetrap, {seconds, 10}}, {procmop, #{cleanup_procs => true}}].
 
 groups() ->
     [

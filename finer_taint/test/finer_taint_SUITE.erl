@@ -21,6 +21,8 @@
 %%% -------------------------------------------------------------------
 -module(finer_taint_SUITE).
 
+-export([suite/0]).
+
 -include_lib("common_test/include/ct.hrl").
 % elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").
@@ -711,3 +713,6 @@ macro_duplicator(Config) ->
     [{leak, Sink, History}] = compile_and_run_function(Config, simple_example, macro_duplicate_main),
     ?assertEqual("simple_example.erl:56", Sink),
     ?assertEqual(["simple_example.erl:53"], abstract_machine_util:get_sources(History)).
+
+suite() ->
+    [{procmop, #{cleanup_procs => true}}].
