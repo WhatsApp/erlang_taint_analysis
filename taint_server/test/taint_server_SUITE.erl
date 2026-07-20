@@ -31,7 +31,8 @@
 
 %% Test cases
 -export([
-    can_write_parallel_instructions_to_file/1
+    can_write_parallel_instructions_to_file/1,
+    can_roundtrip_instruction_with_high_codepoints/1
 ]).
 
 suite() ->
@@ -40,7 +41,8 @@ suite() ->
 groups() ->
     [
         {basic, [
-            can_write_parallel_instructions_to_file
+            can_write_parallel_instructions_to_file,
+            can_roundtrip_instruction_with_high_codepoints
         ]}
     ].
 
@@ -70,6 +72,23 @@ can_write_parallel_instructions_to_file(Config) ->
     ?assertEqual(<<"{pop,{}}.\n">>, Data43),
     {ok, Data42} = file:read_file(AbstrInstructionPrefix ++ "-42"),
     ?assertEqual(<<"{duplicate,{}}.\n">>, Data42).
+
+can_roundtrip_instruction_with_high_codepoints(Config) ->
+    PrivDir = proplists:get_value(priv_dir, Config),
+    AbstrInstructionPrefix = filename:join(PrivDir, "abstr-instr-high-cp"),
+    application:set_env(taint_server, instructions_stream_prefix, AbstrInstructionPrefix),
+    application:start(taint_server),
+    %% A variable/source string carrying Latin-1 high code points (e.g. 233 = é). ~p renders
+    %% it in string form, so without UTF-8-encoding the write, file:consult (which decodes
+    %% UTF-8) rejects the raw byte 0xE9 as {file_io_server, invalid_unicode} on read-back.
+    Instruction = {push, {"café-señor"}},
+    Tid = 7,
+    ok = abstract_machine_server:write_instruction_sync(Tid, Instruction),
+    application:stop(taint_server),
+    ?assertEqual(
+        {ok, [Instruction]},
+        file:consult(AbstrInstructionPrefix ++ "-" ++ integer_to_list(Tid))
+    ).
 
 done() ->
     receive

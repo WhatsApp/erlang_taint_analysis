@@ -105,8 +105,19 @@ handle_cast({write_instruction, Tid, Instruction}, State) ->
 -spec write_instruction(tid(), taint_abstract_machine:instruction(), state()) -> state().
 write_instruction(Tid, Instruction, State) ->
     {State1, TidState} = get_or_create_state_for_tid(Tid, State),
-    ok = file:write(TidState, io_lib:format("~p.~n", [Instruction])),
+    ok = file:write(TidState, to_utf8(io_lib:format("~p.~n", [Instruction]))),
     State1.
+
+% Instruction strings may contain non-ASCII code points (128-255, e.g. accented variable or
+% source names) that ~p renders in string form, so without UTF-8-encoding the write emits raw
+% latin1 bytes that file:consult (which decodes UTF-8) rejects. taint_server intentionally
+% depends only on kernel/stdlib, so this mirrors wa_string:characters_to_binary/1 locally.
+-spec to_utf8(unicode:chardata()) -> binary().
+to_utf8(Data) ->
+    case unicode:characters_to_binary(Data) of
+        Bin when is_binary(Bin) -> Bin;
+        _Other -> error(bad_unicode)
+    end.
 
 -spec tid_to_global_name(tid() | integer()) -> gen_server:server_name().
 tid_to_global_name(Tid) ->
