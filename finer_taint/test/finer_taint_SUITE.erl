@@ -13,13 +13,14 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests for finer taint analysis
-%%%
-%%%     They instrument an erlang file, run a function in the instrumented module,
-%%%     capture output and run it through the abstract machine to get the leaks
-%%% -------------------------------------------------------------------
 -module(finer_taint_SUITE).
+
+-moduledoc """
+Tests for finer taint analysis
+
+They instrument an erlang file, run a function in the instrumented module,
+capture output and run it through the abstract machine to get the leaks
+""".
 
 -export([suite/0]).
 

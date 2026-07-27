@@ -13,14 +13,14 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests for finer taint analysis focusing on multi processing abilities
-%%%
-%%%     The tests are similar to finer_taint_SUITE, except that they use
-%%%     parallel_finer_taint instead pf ct_finer_taint
-%%%
-%%% -------------------------------------------------------------------
 -module(parallel_taint_SUITE).
+
+-moduledoc """
+Tests for finer taint analysis focusing on multi processing abilities
+
+The tests are similar to finer_taint_SUITE, except that they use
+parallel_finer_taint instead pf ct_finer_taint
+""".
 
 -include_lib("common_test/include/ct.hrl").
 % elp:ignore WA003 (better_assertions) - Open Source

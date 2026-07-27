@@ -13,10 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests taint_gatherer
-%%% -------------------------------------------------------------------
 -module(taint_gatherer_SUITE).
+
+-moduledoc """
+Tests taint_gatherer
+""".
 
 -export([suite/0]).
 

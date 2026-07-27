@@ -13,10 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests abstract_machine_proclet
-%%% -------------------------------------------------------------------
 -module(abstract_machine_proclet_SUITE).
+
+-moduledoc """
+Tests abstract_machine_proclet
+""".
 
 -include_lib("assert/include/assert.hrl").
 

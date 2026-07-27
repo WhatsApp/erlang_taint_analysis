@@ -13,10 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests for taint message_passer
-%%% -------------------------------------------------------------------
 -module(message_passer_SUITE).
+
+-moduledoc """
+Tests for taint message_passer
+""".
 
 % elp:ignore WA003 (better_assertions) - Open Source
 -include_lib("stdlib/include/assert.hrl").

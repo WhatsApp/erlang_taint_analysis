@@ -13,10 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Tests taint_writer
-%%% -------------------------------------------------------------------
 -module(taint_server_SUITE).
+
+-moduledoc """
+Tests taint_writer
+""".
 
 -include_lib("common_test/include/ct.hrl").
 % elp:ignore WA003 (better_assertions) - Open Source

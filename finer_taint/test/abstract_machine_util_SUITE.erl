@@ -13,10 +13,11 @@
 % limitations under the License.
 
 %%% % @format
-%%%-------------------------------------------------------------------
-%%%     Unit tests for abstract_machine_util.erl
-%%% -------------------------------------------------------------------
 -module(abstract_machine_util_SUITE).
+
+-moduledoc """
+Unit tests for abstract_machine_util.erl
+""".
 
 -export([suite/0]).
 
