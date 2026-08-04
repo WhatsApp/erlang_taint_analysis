@@ -174,7 +174,7 @@ compile_and_run_function(Config, Module, Func) ->
                     case {Module, Verbosity =/= 101} of
                         % In the case of gen_server the fixtures rely on specific OTP version
                         % and don't work across OTP versions. So we disable the gen_server tests
-                        % unless vebosity is set for local dev.
+                        % unless verbosity is set for local dev.
                         {example_gen_server, true} ->
                             ok;
                         _ ->

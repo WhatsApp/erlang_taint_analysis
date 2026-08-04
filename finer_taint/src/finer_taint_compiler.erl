@@ -895,7 +895,7 @@ instrument_pattern({float, Anno, _}, State) ->
 instrument_pattern({nil, Anno}, State) ->
     [?EMIT_INSTR(Anno, pop, [])];
 % If E is a bitstring constructor <<E_1:Size_1/TSL_1, ..., E_k:Size_k/TSL_k>>,
-% where each Size_i is an expression and each TSL_i is a type specificer list,
+% where each Size_i is an expression and each TSL_i is a type specifier list,
 % then Rep(E) = {bin,ANNO,[{bin_element,ANNO,Rep(E_1),Rep(Size_1),Rep(TSL_1)}, ..., {bin_element,ANNO,Rep(E_k),Rep(Size_k),Rep(TSL_k)}]}
 instrument_pattern({bin_element, _Anno, Expr, _Size, _Tsl}, State) ->
     instrument_pattern(Expr, State);
