@@ -813,7 +813,7 @@ propagate(
 ) ->
     [Head, Tail] = lists:map(fun(V) when ?NOT_TRY_ENTER(V) -> append_taint_history(V, Loc) end, ListValues),
     State#taint_am_state{stack = [Head, Tail] ++ Stack};
-%% Deconstructing pattern when top of stack is not tained
+%% Deconstructing pattern when top of stack is not tainted
 %% Or is tainted directly meaning the whole list is marked as tainted
 %% not the individual elements.
 %%
@@ -982,7 +982,7 @@ propagate(
         instrumented_return = [true | Ir],
         leaks = NewCoverage
     };
-% Lineage analaysis core
+% Lineage analysis core
 propagate(
     {push_scope, {MFA = {Module, PushedFunction, Arity}, Loc}},
     State = #taint_am_state{
@@ -1004,7 +1004,7 @@ propagate(
     ArgLeaks = [
         begin
             TaintValue = taint_value(TVal),
-            % Storing the line_history history for each arg_leak is prohibitvely expensive
+            % Storing the line_history history for each arg_leak is prohibitively expensive
             % In that case, we only want to store the tainted arguments in the history
             case LineageMode of
                 line_history ->
