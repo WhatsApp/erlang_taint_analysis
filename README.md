@@ -10,7 +10,7 @@ To read the basic concepts behind the analysis check [finer_taint/README](./fine
 
 ## Getting started
 
-### Install prerequisties
+### Install prerequisites
 
 * [Install erlang](https://www.erlang.org/downloads), namely make sure [toolchains/local/erl](./toolchains/local/erl) scripts work
 * This project is built with [Buck2](https://github.com/facebook/buck2).
