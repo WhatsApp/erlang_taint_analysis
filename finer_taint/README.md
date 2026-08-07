@@ -67,7 +67,7 @@ type taint_value(): notaint | {taint, history()}
 ```
 
 A `taint_value` can either represent a value not tainted, or a tainted value with some history of where the value has been.
-For example a `{taint, ["sourcel.erl:2", "source.erl:1"]}` would indicate a tainted value was part of computation on line 1 in `source.erl` followed by some computation at line 2.
+For example a `{taint, ["source.erl:2", "source.erl:1"]}` would indicate a tainted value was part of computation on line 1 in `source.erl` followed by some computation at line 2.
 
 We are going to represent the abstract machine as a list representing the stack
 and a map representing the variable store ( `[], {}`). So an abstract machine
@@ -111,7 +111,7 @@ final instrumented snippet looks like:
 push(notaint),
 AString = "123 is a good start of a string",
 store("AString"),
-push({taint, ["exampler.erl:2"]}),
+push({taint, ["example.erl:2"]}),
 PhoneNumber = finer_taint:source("123@secret.net"),
 store("PhoneNumber")
 ```
