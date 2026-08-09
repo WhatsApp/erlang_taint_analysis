@@ -709,7 +709,7 @@ propagate({construct_pattern, {{cons}, Loc}}, State = #taint_am_state{stack = St
 % For constructing map_patterns the top of the stack should be
 % all the taint value for Values, followed by all the taint values for Keys
 %% Therefore we pop one value off the stack for each Key and construct a map Key => taint_value
-%% Then we pop one value of the stack for each Key again, which represent the taint-ednes of
+%% Then we pop one value off the stack for each Key again, which represent the taint-edness of
 %% the Key and construct a map Key => taint_value.
 propagate({construct_pattern, {{map, Keys}, Loc}}, State = #taint_am_state{stack = Stack}) ->
     {MapKeyValues0, NewStack} = lists:split(length(Keys) * 2 + 1, Stack),
