@@ -14,13 +14,14 @@
 
 %%% % @format
 -module(parallel_abstract_machine).
--compile(warn_missing_spec_all).
 -moduledoc """
 Runs multiple instructions streams exchanging messages
 """.
+-compile(warn_missing_spec_all).
+
+-export([run/1, run_tracing/1, run_lineage/1, run_tracing_lineage/1, run_lineage_with_line_history/1]).
 
 -include_lib("kernel/include/logger.hrl").
--export([run/1, run_tracing/1, run_lineage/1, run_tracing_lineage/1, run_lineage_with_line_history/1]).
 
 % Takes a list of filenames containing instruction streams.
 % Runs all the instructions and returns a list of leaks it found.

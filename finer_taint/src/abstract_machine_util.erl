@@ -14,10 +14,10 @@
 
 %%% % @format
 -module(abstract_machine_util).
--compile(warn_missing_spec_all).
 -moduledoc """
 Contains functions that analyze the output of taint_abstract_machine
 """.
+-compile(warn_missing_spec_all).
 
 %% The client API.
 -export([
