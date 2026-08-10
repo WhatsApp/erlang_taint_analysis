@@ -14,12 +14,12 @@
 
 %%% % @format
 -module(taint_abstract_machine).
--compile(warn_missing_spec_all).
--compile({inline, [taint_value/1]}).
 -moduledoc """
 Runs the instructions emitted by running a program instrumented with finer_taint_compiler to
 compute the result of the analysis and find the leaks
 """.
+-compile(warn_missing_spec_all).
+-compile({inline, [taint_value/1]}).
 
 -include_lib("kernel/include/logger.hrl").
 
