@@ -37,6 +37,9 @@ via abstract_machine_proclet_sup:new_proc()
 
 -export([init/1, handle_cast/2, handle_call/3, terminate/2, handle_info/2]).
 
+% ======== PUBLIC API ==============
+-export([execute_instruction/2, start_link/2, run_instructions_file/2, stop/1]).
+
 -include_lib("kernel/include/logger.hrl").
 
 -record(proclet_state, {
@@ -50,9 +53,6 @@ via abstract_machine_proclet_sup:new_proc()
 }).
 
 -type state() :: #proclet_state{}.
-
-% ======== PUBLIC API ==============
--export([execute_instruction/2, start_link/2, run_instructions_file/2, stop/1]).
 
 % Evolves the internal state of the taint_abstract_machine by executing
 % a single instruction on it.

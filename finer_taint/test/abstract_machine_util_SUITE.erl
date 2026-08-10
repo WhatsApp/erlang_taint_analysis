@@ -21,9 +21,6 @@ Unit tests for abstract_machine_util.erl
 
 -export([suite/0]).
 
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     all/0
@@ -36,6 +33,9 @@ Unit tests for abstract_machine_util.erl
     can_get_dataflows/1,
     can_balance_call_ret_with_joined_message_pass/1
 ]).
+
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 all() ->
     [

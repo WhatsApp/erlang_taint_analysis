@@ -19,9 +19,6 @@
 Tests for taint message_passer
 """.
 
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     all/0,
@@ -40,6 +37,9 @@ Tests for taint message_passer
     message_after_timeout/1,
     first_get_then_set/1
 ]).
+
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 suite() ->
     % The tests in this suite shouldn't take a long time,

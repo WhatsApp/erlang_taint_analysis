@@ -19,10 +19,6 @@
 Tests taint_writer
 """.
 
--include_lib("common_test/include/ct.hrl").
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     suite/0,
@@ -35,6 +31,10 @@ Tests taint_writer
     can_write_parallel_instructions_to_file/1,
     can_roundtrip_instruction_with_high_codepoints/1
 ]).
+
+-include_lib("common_test/include/ct.hrl").
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 suite() ->
     [{procmop, #{cleanup_procs => true}}].

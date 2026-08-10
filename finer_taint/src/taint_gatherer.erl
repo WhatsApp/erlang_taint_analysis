@@ -15,17 +15,22 @@
 %%% % @format
 -module(taint_gatherer).
 
--compile(warn_missing_spec_all).
 -moduledoc """
 This module is used to collect various "leaks" (dataflows) that
 are detected while a taint_abstract_machine is executed on an
 instruction stream. parallel_abstract_machine is an example
 of how this module is meant to be used.
 """.
+-compile(warn_missing_spec_all).
 
 -behaviour(gen_server).
 
 -export([init/1, handle_cast/2, handle_call/3, handle_info/2]).
+
+% ============== PUBLIC API ==============
+-export([add_leaks/2, get_gathered_leaks/3, start_link/0]).
+
+-include_lib("kernel/include/logger.hrl").
 
 % List of pids of proclets that are expected to register leaks
 % [notapid] is an atom that will never match a pid and thus wait until timeout
@@ -39,12 +44,8 @@ of how this module is meant to be used.
     % List of pid() that have added a leak already
     proclet_pids = [] :: proc_pids()
 }).
--include_lib("kernel/include/logger.hrl").
 
 -type state() :: #gatherer_state{}.
-
-% ============== PUBLIC API ==============
--export([add_leaks/2, get_gathered_leaks/3, start_link/0]).
 
 % Called by a "proclet" (taint_abstract_machine that is executing an instruction stream)
 % to register leaks that it has found.

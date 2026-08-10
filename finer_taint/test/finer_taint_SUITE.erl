@@ -24,10 +24,6 @@ capture output and run it through the abstract machine to get the leaks
 
 -export([suite/0]).
 
--include_lib("common_test/include/ct.hrl").
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     all/0,
@@ -82,6 +78,10 @@ capture output and run it through the abstract machine to get the leaks
 
 %Helpers
 -export([assert_instruction_stream_equal/2]).
+
+-include_lib("common_test/include/ct.hrl").
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 groups() ->
     [

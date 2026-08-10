@@ -31,12 +31,17 @@
     instrument_loaded_module/2
 ]).
 
--record(rewrite_state, {
-    source :: file:filename_all(),
-    finer_taint_module :: module(),
-    renamed_modules :: #{module() => module()},
-    module :: module()
-}).
+-type forms() :: [erl_parse:abstract_form()].
+-type options() :: [compile:option()].
+-type expr() :: erl_parse:abstract_expr().
+-type clause() :: erl_parse:abstract_clause().
+
+% Like a Hoare Triple, but completely different. It's a triple because you
+% have {Pre, Expr, Post}, where Expr is the original expr and Pre/Post are
+% instructions that need to be executed before and after the original to
+% perform the analysis
+-type triple() :: {[expr()], expr(), [expr()]}.
+
 -define(RENAMED_MODULES, #{
     queue => modeled_queue,
     maps => modeled_taint_maps,
@@ -54,16 +59,12 @@
     {modeled_erlang, process_dict} => ok
 }).
 
--type forms() :: [erl_parse:abstract_form()].
--type options() :: [compile:option()].
--type expr() :: erl_parse:abstract_expr().
--type clause() :: erl_parse:abstract_clause().
-
-% Like a Hoare Triple, but completely different. It's a triple because you
-% have {Pre, Expr, Post}, where Expr is the original expr and Pre/Post are
-% instructions that need to be executed before and after the original to
-% perform the analysis
--type triple() :: {[expr()], expr(), [expr()]}.
+-record(rewrite_state, {
+    source :: file:filename_all(),
+    finer_taint_module :: module(),
+    renamed_modules :: #{module() => module()},
+    module :: module()
+}).
 
 -spec instrument_known_stdlibs(options()) -> ok.
 instrument_known_stdlibs(FinerTaintOptions) ->

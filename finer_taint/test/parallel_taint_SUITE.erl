@@ -22,10 +22,6 @@ The tests are similar to finer_taint_SUITE, except that they use
 parallel_finer_taint instead pf ct_finer_taint
 """.
 
--include_lib("common_test/include/ct.hrl").
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     suite/0,
@@ -49,6 +45,10 @@ parallel_finer_taint instead pf ct_finer_taint
     hibernate/1,
     not_instrumented_send/1
 ]).
+
+-include_lib("common_test/include/ct.hrl").
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 suite() ->
     [{procmop, #{cleanup_procs => true}}].

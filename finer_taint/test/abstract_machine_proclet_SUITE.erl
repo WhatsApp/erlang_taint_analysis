@@ -19,8 +19,6 @@
 Tests abstract_machine_proclet
 """.
 
--include_lib("assert/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     suite/0,
@@ -35,6 +33,8 @@ Tests abstract_machine_proclet
     message_pass_between_proclets/1,
     runs_some_instructions/1
 ]).
+
+-include_lib("assert/include/assert.hrl").
 
 groups() ->
     [

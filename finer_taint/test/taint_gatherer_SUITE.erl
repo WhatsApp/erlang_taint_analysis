@@ -21,9 +21,6 @@ Tests taint_gatherer
 
 -export([suite/0]).
 
-% elp:ignore WA003 (better_assertions) - Open Source
--include_lib("stdlib/include/assert.hrl").
-
 %% Test server callbacks
 -export([
     all/0,
@@ -35,6 +32,9 @@ Tests taint_gatherer
     can_gather_leaks/1,
     waits_for_leaks/1
 ]).
+
+% elp:ignore WA003 (better_assertions) - Open Source
+-include_lib("stdlib/include/assert.hrl").
 
 groups() ->
     [

@@ -16,8 +16,8 @@
 
 -module(taint_server_sup).
 
--behaviour(supervisor).
 -compile(warn_missing_spec_all).
+-behaviour(supervisor).
 
 -export([start_link/0]).
 

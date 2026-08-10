@@ -21,8 +21,6 @@ compute the result of the analysis and find the leaks
 -compile(warn_missing_spec_all).
 -compile({inline, [taint_value/1]}).
 
--include_lib("kernel/include/logger.hrl").
-
 %% The client API.
 -export([
     get_leaks/1,
@@ -50,6 +48,8 @@ compute the result of the analysis and find the leaks
     models/0,
     try_catch_state/0
 ]).
+
+-include_lib("kernel/include/logger.hrl").
 
 -include_lib("finer_taint/include/non_lineage_modules.hrl").
 

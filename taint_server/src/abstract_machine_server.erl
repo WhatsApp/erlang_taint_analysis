@@ -21,12 +21,12 @@
 
 -export([init/1, handle_cast/2, handle_call/3, terminate/2]).
 
--include_lib("taint_server/include/taint_server.hrl").
+% ======== PUBLIC API ==============
+-export([write_instruction/2, start_link/2, write_instruction_sync/2]).
 
--record(abstract_machine_server_state, {
-    filename :: string(),
-    tid_state_map :: #{tid() => per_tid_state()}
-}).
+-export_type([tid/0]).
+
+-include_lib("taint_server/include/taint_server.hrl").
 
 %% tid() is similar to pid(), but it represent the id of the abstract machine executing
 %% an instruction stream for a particular process. In other words, where real processes
@@ -34,12 +34,13 @@
 -type tid() :: integer().
 
 -type per_tid_state() :: file:io_device().
+
+-record(abstract_machine_server_state, {
+    filename :: string(),
+    tid_state_map :: #{tid() => per_tid_state()}
+}).
+
 -type state() :: #abstract_machine_server_state{}.
-
--export_type([tid/0]).
-
-% ======== PUBLIC API ==============
--export([write_instruction/2, start_link/2, write_instruction_sync/2]).
 
 -spec write_instruction(tid(), taint_abstract_machine:instruction()) -> ok.
 write_instruction(Tid, Instruction) ->
