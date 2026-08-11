@@ -577,7 +577,6 @@ propagate(
     ?NOT_TRY_ENTER(Capture)
 ->
     % Note: maybe add a marker to taint history that it went through restore_capture
-    % eqwalizer:fixme handle negative guard above T192344722
     Capture1 = append_taint_history_base(Capture, {call_site, {Module, Function, Arity}, Loc}),
     NewScope =
         case Capture1 of
