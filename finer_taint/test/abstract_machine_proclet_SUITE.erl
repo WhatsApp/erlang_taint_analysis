@@ -75,8 +75,8 @@ done() ->
 message_pass_between_proclets(_Config) ->
     taint_message_passer:init(),
     {ok, SupPid} = online_finer_taint_sup:start_link(),
-    ?assertNotEqual(whereis(taint_gatherer), undefined),
-    ?assertNotEqual(whereis(abstract_machine_proclet_sup), undefined),
+    ?assertNotEqual(undefined, whereis(taint_gatherer)),
+    ?assertNotEqual(undefined, whereis(abstract_machine_proclet_sup)),
     Parent = self(),
     spawn(fun() ->
         online_finer_taint:write_instruction({push, {notaint}}),
