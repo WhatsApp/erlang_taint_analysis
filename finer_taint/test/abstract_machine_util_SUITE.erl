@@ -104,43 +104,43 @@ can_get_dataflows(_Config) ->
         maps:keys(abstract_machine_util:get_dataflows(TaintHistory))
     ).
 
+%% A return_site pushed before the join is balanced independently inside each
+%% joined branch: only the branches whose call site agrees with it - or that use
+%% the "unknown" wildcard - cancel it, the others keep both frames in the
+%% dataflow annotation.
 can_balance_call_ret_with_joined_history(_Config) ->
     TaintHistory = [
         {call_site, {current_module, pack, 1}, "simple_example.erl:30"},
-        {return_site, {operators, '+', 2}, "simple_example.erl:30"},
+        {return_site, {current_module, unpack, 1}, "simple_example.erl:20"},
         {joined_history, model, [
+            %% Same MFA, same call site: balanced, both frames disappear
             [
-                {call_site, {operators, '+', 2}, "simple_example.erl:30"},
-                {arg_taint, {{simple_example, lineage_entry, 2}, 2}},
-                {call_site, {current_module, lineage_entry, 2}, "unknown"}
+                {call_site, {current_module, unpack, 1}, "simple_example.erl:20"},
+                {arg_taint, {{simple_example, lineage_entry, 3}, 1}}
             ],
+            %% Same MFA, different call site: not balanced, both frames kept
             [
-                {call_site, {operators, '+', 2}, "simple_example.erl:30"},
-                {return_site, {current_module, unpack, 1}, "simple_example.erl:30"},
-                {arg_taint, {{simple_example, unpack, 1}, 1}},
-                {call_site, {current_module, unpack, 1}, "simple_example.erl:30"},
-                {return_site, {current_module, pack, 1}, "simple_example.erl:29"},
-                {arg_taint, {{simple_example, pack, 1}, 1}},
-                {call_site, {current_module, pack, 1}, "simple_example.erl:29"},
-                {arg_taint, {{simple_example, lineage_entry, 2}, 1}},
-                {call_site, {current_module, lineage_entry, 2}, "unknown"}
+                {call_site, {current_module, unpack, 1}, "simple_example.erl:21"},
+                {arg_taint, {{simple_example, lineage_entry, 3}, 2}}
+            ],
+            %% Balanced through the "unknown" call site wildcard
+            [
+                {call_site, {current_module, unpack, 1}, "unknown"},
+                {arg_taint, {{simple_example, lineage_entry, 3}, 3}}
             ]
         ]}
     ],
     ?assertEqual(
         [
-            {dataflow_src, {{simple_example, lineage_entry, 2}, 1}, [
+            {dataflow_src, {{simple_example, lineage_entry, 3}, 1}, [
                 {call_site, {current_module, pack, 1}, "simple_example.erl:30"}
             ]},
-            {dataflow_src, {{simple_example, lineage_entry, 2}, 2}, [
+            {dataflow_src, {{simple_example, lineage_entry, 3}, 2}, [
+                {return_site, {current_module, unpack, 1}, "simple_example.erl:20"},
+                {call_site, {current_module, unpack, 1}, "simple_example.erl:21"},
                 {call_site, {current_module, pack, 1}, "simple_example.erl:30"}
             ]},
-            {dataflow_src, {{simple_example, pack, 1}, 1}, [
-                {return_site, {current_module, pack, 1}, "simple_example.erl:29"},
-                {call_site, {current_module, pack, 1}, "simple_example.erl:30"}
-            ]},
-            {dataflow_src, {{simple_example, unpack, 1}, 1}, [
-                {return_site, {current_module, unpack, 1}, "simple_example.erl:30"},
+            {dataflow_src, {{simple_example, lineage_entry, 3}, 3}, [
                 {call_site, {current_module, pack, 1}, "simple_example.erl:30"}
             ]}
         ],
