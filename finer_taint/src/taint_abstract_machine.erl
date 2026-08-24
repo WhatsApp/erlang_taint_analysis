@@ -192,7 +192,7 @@ compute the result of the analysis and find the leaks
     % capture/restore_closure functions are used to implement capturing of values
     % by lambdas.
     % Capture_Closure VariableNames - Store all taint values of Variables in VariableNames
-    % into a {lambda_closur, Scope} taint value and push it onto the stack
+    % into a {lambda_closure, Scope} taint value and push it onto the stack
     | {capture_closure, {[string()]}}
     % Pops a value of the stack, if untainted push an empty scope
     % If the value is {lambda_closure, Scope}, push the Scope
