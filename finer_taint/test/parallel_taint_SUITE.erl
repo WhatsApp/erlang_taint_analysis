@@ -337,7 +337,10 @@ test_gen_server(Config) ->
     application:stop(taint_server),
 
     % Escript test
-    EscriptOutputFile = filename:join(proplists:get_value(data_dir, Config), "escript_output_file.lineage"),
+    % Write to priv_dir, not data_dir: data_dir is a single buck2 artifact directory shared by
+    % every concurrent execution of this target, so parallel runs of this test case (CI stress
+    % runs, buck2 --stress-runs) would truncate each other's output file while it is being read.
+    EscriptOutputFile = filename:join(proplists:get_value(priv_dir, Config), "escript_output_file.lineage"),
     run_finer_taint_escript:main(
         ["run-lineage"] ++ AnalysisInstrFiles ++ ["-arg-lineage-hr", "-to-file", EscriptOutputFile]
     ),
