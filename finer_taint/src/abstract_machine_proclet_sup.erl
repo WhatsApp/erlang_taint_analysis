@@ -28,7 +28,7 @@ Used to create new proclets and tell them to stop.
 
 -export([init/1]).
 
--spec start_link(map()) -> supervisor:startlink_ret().
+-spec start_link(taint_abstract_machine:init_args()) -> supervisor:startlink_ret().
 start_link(AbstractMachineArgs) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, [AbstractMachineArgs]).
 
@@ -41,7 +41,7 @@ start_link(AbstractMachineArgs) ->
 %%                  shutdown => shutdown(), % optional
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
--spec init([map()]) -> {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}.
+-spec init([taint_abstract_machine:init_args()]) -> {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}.
 init([AbstractMachineArgs]) ->
     SupFlags = #{
         strategy => simple_one_for_one,

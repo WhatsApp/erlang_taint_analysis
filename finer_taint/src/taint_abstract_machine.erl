@@ -46,6 +46,7 @@ compute the result of the analysis and find the leaks
     deconstruct_pattern_types/0,
     dataflow_map/0,
     models/0,
+    init_args/0,
     try_catch_state/0
 ]).
 
@@ -236,6 +237,14 @@ compute the result of the analysis and find the leaks
 -type lineage_mode() :: false | line_history | function_history | coverage.
 -type lineage_modules_denylist() :: #{module() => ok}.
 
+-type init_args() :: #{
+    tracing => boolean(),
+    coverage_prefix => string(),
+    lineage_mode => lineage_mode(),
+    lineage_modules_denymap => lineage_modules_denylist(),
+    taint_models => models()
+}.
+
 -record(taint_am_state, {
     stack = [] :: stack(),
     scopes = [#{}] :: scopes(),
@@ -267,7 +276,7 @@ run_tracing(Filepath) ->
         #taint_am_state{}
     ).
 
--spec init_state(map()) -> state().
+-spec init_state(init_args()) -> state().
 init_state(Args) when is_map(Args) ->
     Models = maps:get(taint_models, Args, abstract_machine_util:get_priv_models()),
     #taint_am_state{

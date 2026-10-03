@@ -75,7 +75,7 @@ stop(Pid) ->
 % Starts a new abstract_machine_proclet. InitStateArgs is passed
 % to taint_abstract_machine:init_state/2. If InitStateArgs contains
 % a tracing key, that is used to set the tracing flag of abstract_machine_proclet
--spec start_link(map(), gen_server:server_ref()) -> term().
+-spec start_link(taint_abstract_machine:init_args(), gen_server:server_ref()) -> term().
 start_link(InitStateArgs, Gatherer) ->
     gen_server:start_link(?MODULE, [Gatherer, InitStateArgs], []).
 

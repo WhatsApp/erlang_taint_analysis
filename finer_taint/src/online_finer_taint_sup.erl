@@ -32,7 +32,7 @@ NOTE: currently this is missing taint_message_passer initialization
 -spec start_link() -> supervisor:startlink_ret().
 start_link() ->
     start_link(#{}).
--spec start_link(map()) -> supervisor:startlink_ret().
+-spec start_link(taint_abstract_machine:init_args()) -> supervisor:startlink_ret().
 start_link(AbstractMachineArgs) ->
     supervisor:start_link({local, ?MODULE}, ?MODULE, [AbstractMachineArgs]).
 
@@ -45,7 +45,7 @@ start_link(AbstractMachineArgs) ->
 %%                  shutdown => shutdown(), % optional
 %%                  type => worker(),       % optional
 %%                  modules => modules()}   % optional
--spec init([map()]) -> {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}.
+-spec init([taint_abstract_machine:init_args()]) -> {ok, {supervisor:sup_flags(), [supervisor:child_spec()]}}.
 init([AbstractMachineArgs]) ->
     SupFlags = #{
         strategy => one_for_all,

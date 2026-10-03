@@ -56,7 +56,7 @@ run_lineage_with_line_history(Filepaths) ->
 run_tracing_lineage(Filepaths) ->
     run_impl(Filepaths, #{lineage_mode => function_history, tracing => true}).
 
--spec run_impl([string()], map()) -> taint_abstract_machine:leaks().
+-spec run_impl([string()], taint_abstract_machine:init_args()) -> taint_abstract_machine:leaks().
 run_impl(Filepaths, TaintMachineArgs) ->
     {ok, SupPid} = online_finer_taint_sup:start_link(TaintMachineArgs),
     % Start 1 proclet for each filepath
