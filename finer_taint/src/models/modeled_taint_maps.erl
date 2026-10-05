@@ -129,11 +129,11 @@ values(Map) ->
 merge(Map1, Map2) ->
     fold(fun(Map1Key, Map1Val, Acc) -> Acc#{Map1Key => Map1Val} end, Map2, Map1).
 
--spec from_list(list()) -> map().
+-spec from_list([{K, V}]) -> #{K => V}.
 from_list(List) ->
     from_list_impl(List, #{}).
 
--spec from_list_impl(list(), map()) -> map().
+-spec from_list_impl([{K, V}], #{K => V}) -> #{K => V}.
 from_list_impl([], Map) ->
     Map;
 from_list_impl([{Key, Value} | Tail], Map) ->
@@ -287,11 +287,11 @@ filter(Pred, Map) ->
 filtermap(Fun, Map) ->
     filter(Fun, Map).
 
--spec from_keys(list(), term()) -> map().
+-spec from_keys([K], V) -> #{K => V}.
 from_keys(List, Value) ->
     from_keys_impl(List, Value, #{}).
 
--spec from_keys_impl(list(), term(), map()) -> map().
+-spec from_keys_impl([K], V, #{K => V}) -> #{K => V}.
 from_keys_impl([], _, Map) ->
     Map;
 from_keys_impl([Key | Tail], Value, Map) ->

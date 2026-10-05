@@ -47,6 +47,9 @@ Contains functions that analyze the output of taint_abstract_machine
 -type infer_report() :: map().
 % The n-th parameter of MFA
 -type mfan() :: {mfa(), non_neg_integer()}.
+-type annotation_set() :: #{taint_abstract_machine:taint_history() => ok}.
+-type annotated_lineage() :: #{{mfan(), mfan()} => annotation_set()}.
+-type lineage_path() :: [taint_abstract_machine:taint_history_point() | {arg_leak, {mfa(), integer()}}].
 
 % Url where files can be found
 -define(SOURCE_URL, "https//none.com/files/").
@@ -137,7 +140,7 @@ print_leaks([{leak, Sink, History} | Tail], Acc) ->
 % Example usage:
 % abstract_machine_util:graphviz_leaks(Leak, [pastry]).
 % abstract_machine_util:graphviz_leaks(Leak, []).
--spec graphviz_leaks(taint_abstract_machine:leaks(), list()) -> ok.
+-spec graphviz_leaks(taint_abstract_machine:leaks(), [pastry]) -> ok.
 graphviz_leaks([], _) ->
     ok;
 graphviz_leaks([Leak = {leak, Sink, _History} | Tail], Options) ->
@@ -233,7 +236,7 @@ annotations_impl([{message_pass, Loc} | Tail]) ->
     ["mp@" ++ Loc | annotations_impl(Tail)].
 
 % Pretty print all the annotations.
--spec annotations(#{list() => ok}) -> [string()].
+-spec annotations(annotation_set()) -> [string()].
 annotations(Map) when is_map(Map) ->
     [string:join(annotations_impl(Annot), ";") || Annot := _ <- Map].
 
@@ -264,10 +267,14 @@ annotations(Map) when is_map(Map) ->
 % useful for connecting with any other edges and are therefore not
 % interesting and dropped by `filter_message_pass/1`
 
--spec filter_message_pass(list()) -> list().
+-spec filter_message_pass(taint_abstract_machine:taint_history()) -> taint_abstract_machine:taint_history().
 filter_message_pass(Input) ->
     filter_message_pass(Input, [], []).
--spec filter_message_pass(list(), list(), list()) -> list().
+-spec filter_message_pass(
+    taint_abstract_machine:taint_history(),
+    taint_abstract_machine:taint_history(),
+    taint_abstract_machine:taint_history()
+) -> taint_abstract_machine:taint_history().
 filter_message_pass([{message_pass, _} | T], MaybeAfterFirstMessagePass, []) ->
     filter_message_pass(T, [], MaybeAfterFirstMessagePass);
 filter_message_pass([{message_pass, _} | T], _MaybeAfterFirstMessagePass, BeforeFirstMessagePass) ->
@@ -283,7 +290,7 @@ filter_message_pass([], MaybeAfterFirstMessagePass, BeforeFirstMessagePass) ->
     ).
 
 % Apply filter_message_pass to the Lineage obtained from get_arg_lineage_impl
--spec fold_message_passes(#{tuple() => #{list() => ok}}) -> #{tuple() => #{list() => ok}}.
+-spec fold_message_passes(annotated_lineage()) -> annotated_lineage().
 fold_message_passes(AnnotatedLineage) ->
     #{
         K => #{filter_message_pass(Annot) => ok || Annot := _ <- Annotation}
@@ -347,13 +354,13 @@ get_arg_lineage(Leaks, OutputFormat) ->
             ])
     end.
 
--spec get_arg_lineage_raw(taint_abstract_machine:leaks()) -> [tuple()].
+-spec get_arg_lineage_raw(taint_abstract_machine:leaks()) -> [{mfan(), mfan()}].
 get_arg_lineage_raw(Leaks) ->
     AnnotatedLineage = get_arg_lineage_impl(Leaks, #{}),
     FoldedMessagesLineage = fold_message_passes(AnnotatedLineage),
     maps:keys(FoldedMessagesLineage).
 -spec get_arg_lineage_impl(taint_abstract_machine:leaks(), Acc) -> Acc when
-    Acc :: #{{mfan(), mfan()} => map()}.
+    Acc :: annotated_lineage().
 get_arg_lineage_impl([_L = {arg_leak, {ToMFA, ToArgN, _Loc}, Froms} | Tail], MapAcc) ->
     Acc1 = lists:foldl(
         history_folder(ToMFA, ToArgN),
@@ -367,7 +374,7 @@ get_arg_lineage_impl([], Acc) ->
 -spec history_folder(erlang:mfa(), integer()) ->
     fun((taint_abstract_machine:taint_history_point() | [taint_abstract_machine:taint_history()], Acc) -> Acc)
 when
-    Acc :: #{{mfan(), mfan()} => map()}.
+    Acc :: annotated_lineage().
 history_folder(ToMFA, ToArgN) ->
     fun
         HistoryFolder({dataflow_src, {FromMFA, FromArgN}, Annotation}, FoldAcc) ->
@@ -423,7 +430,8 @@ history_folder(ToMFA, ToArgN) ->
 query_arg_lineage(Leaks, QueryLineage) ->
     query_arg_lineage_impl(Leaks, [], QueryLineage).
 
--spec query_arg_lineage_impl(taint_abstract_machine:leaks(), list(), {mfa(), integer(), mfa(), integer()}) -> list().
+-spec query_arg_lineage_impl(taint_abstract_machine:leaks(), [lineage_path()], {mfa(), integer(), mfa(), integer()}) ->
+    [lineage_path()].
 query_arg_lineage_impl(
     [{arg_leak, {ToMFA, ToArgN, _Loc}, Froms} | Tail], Acc, Query = {FromMFA, FromArgN, ToMFA, ToArgN}
 ) ->

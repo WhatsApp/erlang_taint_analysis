@@ -58,6 +58,8 @@
 % SPAWN_FUNCTIONS are a map so we can use is_map_key in guards
 -define(SPAWN_FUNCTIONS, #{spawn => ok, spawn_link => ok, spawn_monitor => ok, spawn_opt => ok}).
 
+-type try_block_id() :: {module(), non_neg_integer(), non_neg_integer()}.
+
 %% =================== MARKER API  ============================
 %% These functions annotate source and sinks and are meant to be
 %% placed in the code under analysis by some other method:
@@ -385,7 +387,7 @@ deconstruct_pattern(Loc, CallbackModule, Pattern) ->
     CallbackModule:write_instruction({deconstruct_pattern, {Pattern, create_taint_value(Loc)}}),
     ok.
 
--spec try_catch(string(), atom(), taint_abstract_machine:try_catch_state(), tuple()) -> ok.
+-spec try_catch(string(), atom(), taint_abstract_machine:try_catch_state(), try_block_id()) -> ok.
 try_catch(Loc, CallbackModule, Status, TryBlockId) ->
     CallbackModule:write_instruction({try_catch, {Status, TryBlockId}, Loc}),
     ok.

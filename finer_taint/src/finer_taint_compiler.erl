@@ -296,13 +296,13 @@ concat([H | T]) -> H ++ concat(T).
 
 % Converts a list (ie. [1]) into the Ast of the list (ie. {cons, Anno, 1, {nil, Anno}})
 % This is useful when passing multiple values to instrumentation in a single argument
--spec list_to_list_ast(erl_anno:anno(), list()) -> expr().
+-spec list_to_list_ast(erl_anno:anno(), [expr()]) -> expr().
 list_to_list_ast(Anno, []) ->
     {nil, Anno};
 list_to_list_ast(Anno, [H | T]) ->
     {cons, Anno, H, list_to_list_ast(Anno, T)}.
 
--spec string_list_to_ast(erl_anno:anno(), list()) -> expr().
+-spec string_list_to_ast(erl_anno:anno(), [atom()]) -> expr().
 string_list_to_ast(Anno, List) ->
     ListOfStrings = [{string, Anno, lists:flatten(io_lib:format("~s", [String]))} || String <:- List],
     list_to_list_ast(Anno, ListOfStrings).
