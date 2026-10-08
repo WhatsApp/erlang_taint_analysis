@@ -44,7 +44,25 @@ Contains functions that analyze the output of taint_abstract_machine
     source => binary(),
     trace => binary()
 }.
--type infer_report() :: map().
+-type infer_report() :: #{
+    bug_type := binary(),
+    qualifier := binary(),
+    severity := binary(),
+    file := binary(),
+    line := integer(),
+    procedure := binary(),
+    procedure_start_line := integer(),
+    bug_trace := [infer_bug_trace()],
+    key := binary(),
+    hash := binary()
+}.
+-type infer_bug_trace() :: #{
+    level := 0,
+    filename := binary(),
+    line_number := integer(),
+    column_number := -1,
+    description := binary()
+}.
 % The n-th parameter of MFA
 -type mfan() :: {mfa(), non_neg_integer()}.
 -type annotation_set() :: #{taint_abstract_machine:taint_history() => ok}.
@@ -576,8 +594,7 @@ to_infer_report([{leak, Sink, History} | Tail], Acc) ->
     BugReports = [to_infer_bug_report(Hist, Sink) || Hist <:- LinearHistories],
     to_infer_report(Tail, BugReports ++ Acc).
 
--spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) ->
-    #{level := 0, filename := binary(), line_number := integer(), column_number := -1, description := binary()}.
+-spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) -> infer_bug_trace().
 to_infer_bug_trace({step, Location}) ->
     {Filename, Line} =
         case get_file_path(Location) of

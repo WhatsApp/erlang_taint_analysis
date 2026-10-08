@@ -1209,7 +1209,10 @@ create_blackhole(TaintValues) when is_list(TaintValues) ->
     Sources = [get_taint_sources(get_history(TVal), []) || TVal <- TaintValues],
     {taint, [{blackhole, lists:usort(lists:foldl(fun lists:append/2, [], Sources))}]}.
 
--spec try_enter_predicate(try_block_id()) -> fun((taint_value() | dynamic()) -> boolean()).
+-spec try_enter_predicate(try_block_id()) ->
+    fun(
+        (taint_value() | try_marker() | scopes_map() | #{mfa() => taint_value()} | function_arity() | true) -> boolean()
+    ).
 try_enter_predicate(TryBlockId) ->
     fun
         ({try_enter, TBlockId}) when TryBlockId =:= TBlockId -> false;

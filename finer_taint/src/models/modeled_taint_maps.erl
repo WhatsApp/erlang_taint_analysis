@@ -96,7 +96,7 @@ find(Key, Map) ->
         Map
     ).
 
--spec put(term(), term(), map()) -> term().
+-spec put(K, V, #{K => V}) -> #{K => V}.
 put(Key, Value, Map) ->
     Map#{Key => Value}.
 
@@ -117,7 +117,7 @@ take(Key, Map) ->
             {Value, NewMap}
     end.
 
--spec keys(map()) -> [term()].
+-spec keys(#{K => term()}) -> [K].
 keys(Map) ->
     fold(fun(Key, _, Acc) -> [Key | Acc] end, [], Map).
 
@@ -125,7 +125,7 @@ keys(Map) ->
 values(Map) ->
     fold(fun(_, Value, Acc) -> [Value | Acc] end, [], Map).
 
--spec merge(map(), map()) -> map().
+-spec merge(#{K => V}, #{K => V}) -> #{K => V}.
 merge(Map1, Map2) ->
     fold(fun(Map1Key, Map1Val, Acc) -> Acc#{Map1Key => Map1Val} end, Map2, Map1).
 
@@ -156,7 +156,7 @@ with_impl([Key | Tail], Map, Acc) ->
 size(Map) ->
     fold(fun(_, _, Cnt) -> Cnt + 1 end, 0, Map).
 
--spec remove(term(), map()) -> map().
+-spec remove(term(), #{K => V}) -> #{K => V}.
 remove(Key, Map) ->
     fold(
         fun(K, V, Acc) ->
@@ -224,11 +224,11 @@ update_with(Key, Fun, Init, Map) ->
         Val -> Map#{Key => Fun(Val)}
     end.
 
--spec iterator(map()) -> {map(), maps:iterator()}.
+-spec iterator(#{K => V}) -> {#{K => V}, maps:iterator(K, V)}.
 iterator(Map) ->
     {Map, maps:iterator(Map)}.
 
--spec next({map(), maps:iterator()}) -> {term(), term(), {map(), maps:iterator()}} | none.
+-spec next({#{K => V}, maps:iterator(K, V)}) -> {K, V, {#{K => V}, maps:iterator(K, V)}} | none.
 next({Map, Iterator}) ->
     case maps:next(Iterator) of
         none ->
@@ -252,16 +252,15 @@ groups_from_list_impl(KeyFun, ValueFun, [H | T], Acc) ->
 groups_from_list_impl(_, _, [], Acc) ->
     Acc.
 
--spec foreach(fun((term(), term()) -> term()), map()) -> ok.
+-spec foreach(fun((K, V) -> term()), #{K => V}) -> ok.
 foreach(Fun, Map) ->
     map(Fun, Map),
     ok.
 
 -spec without(Ks, Map1) -> Map2 when
-    Ks :: [K],
-    Map1 :: map(),
-    Map2 :: map(),
-    K :: term().
+    Ks :: [term()],
+    Map1 :: #{K => V},
+    Map2 :: #{K => V}.
 
 without(Ks, M) when is_list(Ks), is_map(M) ->
     lists:foldl(fun remove/2, M, Ks).
