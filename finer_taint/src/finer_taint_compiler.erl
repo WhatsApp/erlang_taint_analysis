@@ -307,7 +307,7 @@ string_list_to_ast(Anno, List) ->
     ListOfStrings = [{string, Anno, lists:flatten(io_lib:format("~s", [String]))} || String <:- List],
     list_to_list_ast(Anno, ListOfStrings).
 
--spec map_to_map_ast(erl_anno:anno(), map()) -> expr().
+-spec map_to_map_ast(erl_anno:anno(), #{module() => module()}) -> expr().
 map_to_map_ast(Anno, Map) ->
     Assocs = maps:fold(
         fun(K, V, Acc) when is_atom(K), is_atom(V) ->

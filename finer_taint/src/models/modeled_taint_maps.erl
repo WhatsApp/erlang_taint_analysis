@@ -207,7 +207,7 @@ is_key(Key, Map) ->
         error:{badmatch, _} -> false
     end.
 
--spec new() -> map().
+-spec new() -> #{}.
 new() ->
     #{}.
 
