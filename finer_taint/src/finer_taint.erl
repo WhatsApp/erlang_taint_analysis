@@ -22,7 +22,7 @@
 -module(finer_taint).
 -compile(warn_missing_spec_all).
 
--callback write_instruction(Instruction :: taint_abstract_machine:instruction()) -> ok.
+-callback write_instruction(Instruction :: taint_types:instruction()) -> ok.
 
 %% marker API
 -export([
@@ -373,7 +373,7 @@ call_fun(Loc, CallbackModule, Module, Function, Arity) ->
     CallbackModule:write_instruction({call_fun, {Module, Function, Arity}, create_taint_value(Loc)}),
     ok.
 
--spec construct_pattern(string(), atom(), taint_abstract_machine:construct_pattern_types()) -> ok.
+-spec construct_pattern(string(), atom(), taint_types:construct_pattern_types()) -> ok.
 construct_pattern(Loc, CallbackModule, {map, Keys}) ->
     FilteredKeys = [pid_to_str(K) || K <- Keys],
     CallbackModule:write_instruction({construct_pattern, {{map, FilteredKeys}, create_taint_value(Loc)}}),
@@ -382,12 +382,12 @@ construct_pattern(Loc, CallbackModule, Pattern) ->
     CallbackModule:write_instruction({construct_pattern, {Pattern, create_taint_value(Loc)}}),
     ok.
 
--spec deconstruct_pattern(string(), atom(), taint_abstract_machine:deconstruct_pattern_types()) -> ok.
+-spec deconstruct_pattern(string(), atom(), taint_types:deconstruct_pattern_types()) -> ok.
 deconstruct_pattern(Loc, CallbackModule, Pattern) ->
     CallbackModule:write_instruction({deconstruct_pattern, {Pattern, create_taint_value(Loc)}}),
     ok.
 
--spec try_catch(string(), atom(), taint_abstract_machine:try_catch_state(), try_block_id()) -> ok.
+-spec try_catch(string(), atom(), taint_types:try_catch_state(), try_block_id()) -> ok.
 try_catch(Loc, CallbackModule, Status, TryBlockId) ->
     CallbackModule:write_instruction({try_catch, {Status, TryBlockId}, Loc}),
     ok.

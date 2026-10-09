@@ -56,7 +56,7 @@ via abstract_machine_proclet_sup:new_proc()
 
 % Evolves the internal state of the taint_abstract_machine by executing
 % a single instruction on it.
--spec execute_instruction(gen_server:server_ref(), taint_abstract_machine:instruction()) -> ok.
+-spec execute_instruction(gen_server:server_ref(), taint_types:instruction()) -> ok.
 execute_instruction(Pid, Instruction) ->
     gen_server:cast(Pid, {execute_instruction, Instruction}).
 
@@ -121,7 +121,7 @@ handle_call(Msg, _From, State) ->
 -spec handle_cast(
     {run_instructions_file, FileName :: string()}
     | {stop}
-    | {execute_instruction, Instruction :: taint_abstract_machine:instruction()},
+    | {execute_instruction, Instruction :: taint_types:instruction()},
     state()
 ) ->
     {noreply, state()}
@@ -154,7 +154,7 @@ handle_info({got_key, MessageId, _}, State) ->
 
 % Execute an instruction on the internal state. Returns taint_machine_crash
 % if there was an error when executing the taint_abstract_machine
--spec execute_instruction_impl(taint_abstract_machine:instruction(), state()) ->
+-spec execute_instruction_impl(taint_types:instruction(), state()) ->
     state() | taint_machine_crash.
 execute_instruction_impl(Instruction, State) ->
     trace(Instruction, State),
@@ -170,7 +170,7 @@ execute_instruction_impl(Instruction, State) ->
     end.
 
 % Wrapper for taint_abstract_machine propagate
--spec propagate(taint_abstract_machine:instruction(), state()) -> taint_abstract_machine:state().
+-spec propagate(taint_types:instruction(), state()) -> taint_abstract_machine:state().
 propagate(Instruction, #proclet_state{state = AmState, coverage_prefix = CoveragePrefix}) when
     is_list(CoveragePrefix)
 ->
@@ -178,7 +178,7 @@ propagate(Instruction, #proclet_state{state = AmState, coverage_prefix = Coverag
 propagate(Instruction, #proclet_state{state = AmState}) ->
     taint_abstract_machine:propagate(Instruction, AmState).
 
--spec trace(taint_abstract_machine:instruction(), state()) -> ok.
+-spec trace(taint_types:instruction(), state()) -> ok.
 trace(_, #proclet_state{tracing = false}) ->
     ok;
 trace(Instruction, #proclet_state{state = AmState, tracing = true}) ->
@@ -186,7 +186,7 @@ trace(Instruction, #proclet_state{state = AmState, tracing = true}) ->
     ok.
 
 -spec instructions_folder(
-    taint_abstract_machine:instruction(),
+    taint_types:instruction(),
     state() | {taint_machine_crash, state()}
 ) -> state() | {taint_machine_crash, state()}.
 instructions_folder(_Instruction, Acc = {taint_machine_crash, _}) ->

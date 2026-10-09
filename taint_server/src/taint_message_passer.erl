@@ -35,11 +35,11 @@ uninit() ->
     ets:delete(taint_messages),
     ok.
 
--spec blocking_get(string()) -> taint_abstract_machine:taint_value().
+-spec blocking_get(string()) -> taint_types:taint_value().
 blocking_get(MessageId) ->
     blocking_get(MessageId, 12000).
 
--spec blocking_get(string(), erlang:timeout()) -> taint_abstract_machine:taint_value().
+-spec blocking_get(string(), erlang:timeout()) -> taint_types:taint_value().
 blocking_get(MessageId, Timeout) ->
     case ets:insert_new(taint_messages, {MessageId, nomsg, self()}) of
         false ->
@@ -58,7 +58,7 @@ blocking_get(MessageId, Timeout) ->
             end
     end.
 
--spec set(string(), taint_abstract_machine:taint_value()) -> ok.
+-spec set(string(), taint_types:taint_value()) -> ok.
 set(MessageId, Message) ->
     case ets:insert_new(taint_messages, {MessageId, Message, nopid}) of
         true ->

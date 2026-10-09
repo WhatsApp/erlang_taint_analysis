@@ -35,196 +35,42 @@ compute the result of the analysis and find the leaks
     get_taint_sources/2
 ]).
 -export_type([
-    taint_value/0,
     leaks/0,
     leaks_map/0,
     state/0,
-    taint_history/0,
-    taint_history_point/0,
-    instruction/0,
-    construct_pattern_types/0,
-    deconstruct_pattern_types/0,
     dataflow_map/0,
     models/0,
-    init_args/0,
-    try_catch_state/0
+    init_args/0
 ]).
 
 -include_lib("kernel/include/logger.hrl").
 
 -include_lib("finer_taint/include/non_lineage_modules.hrl").
 
-% lineage_point represents an argument of a function, mfa() identifies the function
-% and integer() is the argument number starting with 1
--type lineage_point() :: {mfa(), integer()}.
-
--type taint_source() ::
-    % arg_taint is similar to source, but it is not necessarily the beginning
-    % of taint_history. That is multiple arg_taint points can be found
-    % in a single history
-    {arg_taint, lineage_point()}
-    % The source location where this history started.
-    | {tagged_source, string(), string()}
-    | annot_dataflow_src()
-    | {source, string()}.
-
-% taint_history_point() represent a point in the history of a taint value.
-% strings() are usually in the format: some_file.erl:<line number>
--type taint_history_point() ::
-    % A source location where the taint value was
-    {step, string()}
-    % Represent a point where multiple taint_values were put
-    % in a pattern and therefore multiple histories merge
-    | {joined_history, pattern, [taint_history()]}
-    | {joined_history, model, [taint_history()]}
-    | {joined_history, lambda_closure, [taint_history()]}
-    % Represent a point where the value was passed via a message
-    | {message_pass, string()}
-    % {call_site, MFA, Loc} Represents a point in history where the value was
-    % used in a function call to Function/Arity at a source location `Loc`
-    % `Loc` is in <module_name>.erl:<line_number> format
-    | {call_site, mfa(), string()}
-    % {return_site,MFA, Loc} Represents a point in history where the value was
-    % returned to source location Loc from MFA function call.
-    % The Loc should match the one call_site history point
-    | {return_site, mfa(), string()}
-    % Represents a point in history of the taint value where the value
-    % traveled outside of the instrumented code. Therefore we don't
-    % know what happened to it. In order to improve scalability we drop
-    % the full history and just keep the taint sources that went into it
-    % This is probably ok, because the full history is unknown anyway
-    | {blackhole, [taint_source()]}
-    | taint_source().
-
--type taint_history() :: [taint_history_point()].
--type taint_value() ::
-    % untainted value
-    {notaint, []}
-    % A normal tainted value
-    | {taint, taint_history()}
-    % Represents a taint value of a function. The only functions that
-    % can be tainted are lambdas, because they can contain captured
-    % variables. {lambda_closure, Scope} stores all the captured
-    % taint variables in the Scope. The scope needs to be restored
-    % via restore_capture instruction when the function is called.
-    | {lambda_closure, scopes_map()}
-    % A taint value of patterns
-    % For tuple {Val1, Val2, ..., ValN}, the taint value will look like
-    % {pattern_taint, tuple, [ValN, ValN-1, ..., Val1]}
-    | {pattern_taint, tuple, [taint_value()]}
-    % the elements of the pattern are just put in a list in the same order
-    | {pattern_taint, cons, [taint_value()]}
-    % The [number()] contains the byte sizes of taint values
-    | {pattern_taint, {bitstring, [integer()]}, [taint_value()]}
-    % For map #{Key => Value} the corresponding taint_value looks like
-    % #{Key => Taint(Value), abstract_machine_mapkey_taints => #{Key => Taint(Value)}
-    | {pattern_taint, map, #{term() => #{term() => taint_value()} | taint_value()}}.
-
--type scopes_map() :: #{string() => taint_value()}.
-
 -type function_arity() :: {atom(), integer()}.
 
-% Contains {Size, TSL} tuple, more info on TSL here:
-% https://www.erlang.org/doc/apps/erts/absform.html#bitstring-element-type-specifiers
--type bin_pattern_segment() :: {integer() | default, [atom()]}.
--type deconstruct_pattern_types() ::
-    % For destructing the bitstring pattern we also have the TSL
-    % in addition to size in bin_pattern_segment()
-    {bitstring, [bin_pattern_segment()]}
-    | pattern_types_shared().
--type construct_pattern_types() ::
-    % When constructing the bitstring pattern we pass in the byte sizes of each segment
-    {bitstring, [integer()]}
-    | pattern_types_shared().
--type pattern_types_shared() ::
-    % map has a list of Keys
-    {map, [string()]}
-    % tuple has arity, ie the number of elements in the tuple
-    | {tuple, integer()}
-    % Cons is always just a head and a tail
-    | {cons}.
-
--type try_block_id() :: {module(), integer()}.
--type try_marker() :: {try_enter, try_block_id()}.
--type try_catch_state() ::
-    % Indicates try block entry. That is exceptions
-    % after this point should be caught by this try/catch expression
-    try_enter
-    % Indicates try block exit. That is exceptions should no longer
-    % be caught by this try/catch block
-    | try_exit
-    % Indicates catch entry, that is exception was caught by this catch block
-    | catch_enter.
-% The last argument of instructions is always a source location
--type instruction() ::
-    % Push TaintVal instruction - push TaintVal to the stack.
-    {push, {notaint | string() | {string(), string()}}}
-    % Pop instruction - pop a taint value off the stack
-    | {pop, {}}
-    % Duplicate instruction - Duplicate the top of the stack
-    | {duplicate, {}}
-    % Pop a value of the stack and check if it's tainted
-    | {sink, {string()}}
-    % Get Varname instruction - lookup Varname in the scopes and push its value to the stack
-    | {get, {string(), string()}}
-    % Pop top of the stack and send it as MessageId
-    | {send, {MessageId :: string(), string()}}
-    % Receive messageID and push it onto the stack, assume notaint if nomsg
-    | {receive_trace, {MessageId :: string(), string()}}
-    | {receive_trace, {nomsg}}
-    % Apply {M,F,A} - apply M(odule):F(unction)/A(rity) function
-    | {apply, {mfa(), string()}}
-    % Construct PatternType instruction - Pop values needed by PatternType of the stack
-    % and construct a pattern taint value of PatternType
-    | {construct_pattern, {construct_pattern_types(), string()}}
-    % Deconstruct PatternType - pop a pattern taint value of the stack and
-    % push consitutients of PatternType to the stack
-    | {deconstruct_pattern, {deconstruct_pattern_types(), string()}}
-    % Instruction to handle try/catch blocks
-    | {try_catch, {try_catch_state(), try_block_id()}, string()}
-    % Expecting to call a function, used to determine if the stack is setup correctly,
-    % The stack can be setup incorrectly if the called function is not instrumented,
-    % but calls an instrumented function
-    | {call_fun, mfa(), string()}
-    % Push_Scope FunctionName - push a new scope for the FunctionName function
-    | {push_scope, {mfa(), string()}}
-    % Func_Ret FunctionName - Return from FunctionName, mostly just pops the scope
-    | {func_ret, {string(), string()}}
-    % capture/restore_closure functions are used to implement capturing of values
-    % by lambdas.
-    % Capture_Closure VariableNames - Store all taint values of Variables in VariableNames
-    % into a {lambda_closure, Scope} taint value and push it onto the stack
-    | {capture_closure, {[string()]}}
-    % Pops a value of the stack, if untainted push an empty scope
-    % If the value is {lambda_closure, Scope}, push the Scope
-    | {restore_capture, {mfa(), string()}}
-    % Store VarName - Pop a value of the stack and store it in scope with VarName
-    | {store, {string(), string()}}
-    | {set_element, {integer(), integer(), string()}}.
+-type try_marker() :: {try_enter, taint_types:try_block_id()}.
 -type leak() ::
     % Leak in normal mode  {leak, Sink, History}
-    {leak, string(), taint_history()}
+    {leak, string(), taint_types:taint_history()}
     % Leak in coverage mode. Contains a set of all locations the taint value passed through
     | {coverage_leak, string()}
     % Leak in lineage mode to integer() argument of mfa()
-    | {arg_leak, {mfa(), integer(), string()}, taint_history()}
+    | {arg_leak, {mfa(), integer(), string()}, taint_types:taint_history()}
     % Similar to arg_leak, but instead of full taint history,
     % it contains a set (dataflow_map) of all the dataflow_src-es
     % that ended up in this argument.
-    | {{arg_dataflow, {mfa(), integer(), string()}}, annot_dataflow_src()}
+    | {{arg_dataflow, {mfa(), integer(), string()}}, taint_types:annot_dataflow_src()}
     | {arg_dataflow, {mfa(), integer(), string()}, dataflow_map()}.
 -type leaks() :: [leak()].
 
-% Similar to {arg_taint, lineage_point()}, but also contains some taint_history
-% that can be used for annotations. The taint history is usually not fully detailed
--type annot_dataflow_src() :: {dataflow_src, lineage_point(), taint_history()}.
-% Each key in a map represents some dataflow from lineage_point() via taint_history()
-% taint_history() might be reduced. This is a map for deduplication and efficiency
--type dataflow_map() :: #{annot_dataflow_src() => ok}.
+% Each key in a map represents some dataflow from taint_types:lineage_point() via taint_types:taint_history()
+% taint_types:taint_history() might be reduced. This is a map for deduplication and efficiency
+-type dataflow_map() :: #{taint_types:annot_dataflow_src() => ok}.
 -type leaks_map() :: #{leak() => ok}.
 
--type scopes() :: [scopes_map() | try_marker() | #{mfa() => taint_value()}].
--type stack() :: [taint_value() | try_marker()].
+-type scopes() :: [taint_types:scopes_map() | try_marker() | #{mfa() => taint_types:taint_value()}].
+-type stack() :: [taint_types:taint_value() | try_marker()].
 -type models() :: #{{module(), atom()} => sanitize | propagate}.
 
 % false -> don't run in lineage mode
@@ -248,7 +94,7 @@ compute the result of the analysis and find the leaks
 -record(taint_am_state, {
     stack = [] :: stack(),
     scopes = [#{}] :: scopes(),
-    process_dict = {pattern_taint, map, #{}} :: taint_value(),
+    process_dict = {pattern_taint, map, #{}} :: taint_types:taint_value(),
     instrumented_return = [] :: [function_arity() | true | try_marker()],
     leaks = [] :: leaks(),
     % Lineage is not reported for functions for modules in this map
@@ -292,7 +138,7 @@ init_state(Args) when is_map(Args) ->
         )
     }.
 
--spec run(string(), fun((instruction(), state()) -> state()), state()) ->
+-spec run(string(), fun((taint_types:instruction(), state()) -> state()), state()) ->
     state().
 run(Filepath, PropagateFunction, InitState) ->
     {ok, Instructions} = file:consult(Filepath),
@@ -347,7 +193,9 @@ get_leaks(#taint_am_state{leaks = Leaks}) ->
 -spec get_stack(state()) -> stack().
 get_stack(#taint_am_state{stack = Stack}) -> Stack.
 
--spec history_folder(term(), #{term() => taint_value()} | taint_value(), [taint_history()]) -> [taint_history()].
+-spec history_folder(term(), #{term() => taint_types:taint_value()} | taint_types:taint_value(), [
+    taint_types:taint_history()
+]) -> [taint_types:taint_history()].
 history_folder(abstract_machine_mapkey_taints, KeyTaintMap, Acc) when is_map(KeyTaintMap) ->
     maps:fold(
         fun
@@ -362,14 +210,14 @@ history_folder(_Key, {notaint, []}, Acc) ->
 history_folder(_, Value, Acc) when not is_map(Value) ->
     [get_history(Value) | Acc].
 
--spec history_filter(taint_value()) -> {true, taint_history()} | false.
+-spec history_filter(taint_types:taint_value()) -> {true, taint_types:taint_history()} | false.
 history_filter(TaintVal) ->
     case get_history(TaintVal) of
         [] -> false;
         History -> {true, History}
     end.
 
--spec get_history(taint_value()) -> taint_history().
+-spec get_history(taint_types:taint_value()) -> taint_types:taint_history().
 get_history({lambda_closure, Closure}) ->
     Histories = maps:fold(fun history_folder/3, [], Closure),
     case Histories of
@@ -398,17 +246,18 @@ get_history({pattern_taint, _Type, PatternVals}) ->
 get_history({taint, History}) ->
     History.
 
--spec add_arg_taint(taint_value(), lineage_point(), string()) -> taint_value().
+-spec add_arg_taint(taint_types:taint_value(), taint_types:lineage_point(), string()) -> taint_types:taint_value().
 add_arg_taint({notaint, _}, MFAN = {{M, F, A}, _}, Loc) ->
     {taint, [{arg_taint, MFAN}, {call_site, {M, F, A}, Loc}]};
 add_arg_taint(TaintValue, MFAN, _) ->
     append_taint_history_base(TaintValue, {arg_taint, MFAN}).
 
--spec append_taint_history(taint_value(), string()) -> taint_value().
+-spec append_taint_history(taint_types:taint_value(), string()) -> taint_types:taint_value().
 append_taint_history(Value, Loc) ->
     append_taint_history_base(Value, {step, Loc}).
 
--spec append_taint_history_base(taint_value(), taint_history_point()) -> taint_value().
+-spec append_taint_history_base(taint_types:taint_value(), taint_types:taint_history_point()) ->
+    taint_types:taint_value().
 
 append_taint_history_base({lambda_closure, ScopesMap}, HistoryPoint) ->
     NewScopesMap = #{K => append_taint_history_base(V, HistoryPoint) || K := V <- ScopesMap},
@@ -443,9 +292,9 @@ append_taint_history_base({taint, History}, HistoryPoint) ->
 
 -spec map_value_lineage_folder(
     term(),
-    #{term() => taint_value()} | taint_value(),
-    taint_history()
-) -> taint_history().
+    #{term() => taint_types:taint_value()} | taint_types:taint_value(),
+    taint_types:taint_history()
+) -> taint_types:taint_history().
 map_value_lineage_folder(abstract_machine_mapkey_taints, KeyTaintMap, Acc) when is_map(KeyTaintMap) ->
     maps:fold(
         fun(_Key, Value, AccInner) -> get_tainted_args(Value) ++ AccInner end,
@@ -457,7 +306,7 @@ map_value_lineage_folder(_, Value, Acc) when not is_map(Value) ->
 
 %% Traverses the history outputs a filtered history
 %% that only contains [{arg_taint, _}]
--spec extract_tainted_args(taint_history()) -> taint_history().
+-spec extract_tainted_args(taint_types:taint_history()) -> taint_types:taint_history().
 extract_tainted_args(History) ->
     lists:filter(
         fun
@@ -467,9 +316,9 @@ extract_tainted_args(History) ->
         get_taint_sources(History, [])
     ).
 
-%% Traverses the history of taint_value() and outputs a history
+%% Traverses the history of taint_types:taint_value() and outputs a history
 %% that only contains [{arg_taint, _}]
--spec get_tainted_args(taint_value()) -> taint_history().
+-spec get_tainted_args(taint_types:taint_value()) -> taint_types:taint_history().
 get_tainted_args({notaint, []}) ->
     [];
 get_tainted_args({pattern_taint, map, MapVals}) ->
@@ -481,7 +330,7 @@ get_tainted_args({lambda_closure, _History}) ->
 get_tainted_args({taint, History}) ->
     extract_tainted_args(History).
 
--spec is_no_taint(taint_value()) -> boolean().
+-spec is_no_taint(taint_types:taint_value()) -> boolean().
 is_no_taint({notaint, _}) -> true;
 is_no_taint(_) -> false.
 
@@ -493,7 +342,7 @@ is_in_scope(VarName, [TopScope | _]) when is_map_key(VarName, TopScope) ->
 is_in_scope(VarName, [_ | Scopes]) ->
     is_in_scope(VarName, Scopes).
 
--spec find_in_scope(mfa() | string(), scopes()) -> taint_value().
+-spec find_in_scope(mfa() | string(), scopes()) -> taint_types:taint_value().
 find_in_scope(VarName, [{try_enter, _} | Scopes]) ->
     find_in_scope(VarName, Scopes);
 % Assume untainted if not found in scope. This happens
@@ -511,18 +360,18 @@ find_in_scope(VarName, [TopScope | Scopes]) when is_map(TopScope) ->
 %If there are no scopes left, this crashes because it shouldn't happen
 %
 
--spec insert_in_scope(string(), taint_value(), scopes()) -> scopes().
+-spec insert_in_scope(string(), taint_types:taint_value(), scopes()) -> scopes().
 insert_in_scope(VarName, Value, [Te = {try_enter, _} | Scopes]) ->
     [Te | insert_in_scope(VarName, Value, Scopes)];
 insert_in_scope(VarName, Value, [Vars | Scopes]) ->
-    % eqwalizer:ignore - we assume that Vars :: scopes_map() here
+    % eqwalizer:ignore - we assume that Vars :: taint_types:scopes_map() here
     [Vars#{VarName => Value} | Scopes].
 
 % Same as propagate, except that for all instructions whose
 % location matches Prefix, replace the top of the stack
 % with a tainted value if it's not tainted already. This
 % is useful to track all taint originating from a module
--spec propagate_cov(instruction(), state(), string()) -> state().
+-spec propagate_cov(taint_types:instruction(), state(), string()) -> state().
 propagate_cov(Inst, State, Prefix) ->
     NewState = propagate(Inst, State),
     Loc =
@@ -540,7 +389,7 @@ propagate_cov(Inst, State, Prefix) ->
             NewState
     end.
 
--spec propagate(instruction(), state()) -> state().
+-spec propagate(taint_types:instruction(), state()) -> state().
 propagate({duplicate, {}}, State = #taint_am_state{stack = [First | Stack]}) ->
     State#taint_am_state{stack = [First, First | Stack]};
 % Push a no taint value to the stack
@@ -1121,8 +970,10 @@ propagate(Instruction, State) ->
 
 % Note: bit_pattern_take_value currently assumes all the bit patterns are binary
 % There are many other options: https://www.erlang.org/doc/programming_examples/bit_syntax.html#segments
--spec bit_pattern_take_value([bin_pattern_segment()], [taint_value()], [taint_value()]) ->
-    [taint_value()].
+-spec bit_pattern_take_value([taint_types:bin_pattern_segment()], [taint_types:taint_value()], [
+    taint_types:taint_value()
+]) ->
+    [taint_types:taint_value()].
 % There are no bytes left, we are done and return all the values matched
 bit_pattern_take_value([{Size, [binary]}], [], CurrentTaintValues) when Size =:= 0; Size =:= default ->
     CurrentTaintValues;
@@ -1170,7 +1021,7 @@ bit_pattern_take_value([{Size, [binary]} | PatternTail], [HeadByteTaintValue | T
     bit_pattern_take_value([{NewSize, [binary]} | PatternTail], Tail, [NewCurrentTaintValue | Others]).
 
 % This function crashes if the list doesn't contain only taint values
--spec is_all_taint_value([taint_value() | try_marker() | map()]) -> [taint_value()].
+-spec is_all_taint_value([taint_types:taint_value() | try_marker() | map()]) -> [taint_types:taint_value()].
 is_all_taint_value([H = {lambda_closure, _} | T]) ->
     [H | is_all_taint_value(T)];
 is_all_taint_value([H = {notaint, _} | T]) ->
@@ -1182,7 +1033,7 @@ is_all_taint_value([H = {pattern_taint, _, _} | T]) ->
 is_all_taint_value([]) ->
     [].
 
--spec get_taint_sources(taint_history(), [taint_source()]) -> [taint_source()].
+-spec get_taint_sources(taint_types:taint_history(), [taint_types:taint_source()]) -> [taint_types:taint_source()].
 get_taint_sources([], Acc) ->
     Acc;
 get_taint_sources([{step, _} | Tail], Acc) ->
@@ -1204,14 +1055,21 @@ get_taint_sources([{blackhole, Sources} | Tail], Acc) ->
 get_taint_sources([{joined_history, _, History} | Tail], Acc) ->
     get_taint_sources(Tail, lists:foldl(fun get_taint_sources/2, Acc, History)).
 
--spec create_blackhole([taint_value()]) -> taint_value().
+-spec create_blackhole([taint_types:taint_value()]) -> taint_types:taint_value().
 create_blackhole(TaintValues) when is_list(TaintValues) ->
     Sources = [get_taint_sources(get_history(TVal), []) || TVal <- TaintValues],
     {taint, [{blackhole, lists:usort(lists:foldl(fun lists:append/2, [], Sources))}]}.
 
--spec try_enter_predicate(try_block_id()) ->
+-spec try_enter_predicate(taint_types:try_block_id()) ->
     fun(
-        (taint_value() | try_marker() | scopes_map() | #{mfa() => taint_value()} | function_arity() | true) -> boolean()
+        (
+            taint_types:taint_value()
+            | try_marker()
+            | taint_types:scopes_map()
+            | #{mfa() => taint_types:taint_value()}
+            | function_arity()
+            | true
+        ) -> boolean()
     ).
 try_enter_predicate(TryBlockId) ->
     fun
@@ -1225,14 +1083,14 @@ try_enter_predicate(TryBlockId) ->
 % TaintValuesAtByte would be [taintA, taintB, taintB].
 % bit_pattern_take_value then consumes bytes in TaintValuesAtByte
 % according to the BinPattern
--spec match_binary_pattern({[integer()], [taint_value()]}, [bin_pattern_segment()]) ->
-    [taint_value()].
+-spec match_binary_pattern({[integer()], [taint_types:taint_value()]}, [taint_types:bin_pattern_segment()]) ->
+    [taint_types:taint_value()].
 match_binary_pattern({Sizes, BinVals}, BinPatterns) ->
     TaintValuesAtByte =
         [BinVal || Size <:- Sizes && BinVal <:- BinVals, _ <- lists:seq(1, Size)],
     bit_pattern_take_value(BinPatterns, TaintValuesAtByte, []).
 
--spec propagate_taints_for_models([taint_value()]) -> taint_value().
+-spec propagate_taints_for_models([taint_types:taint_value()]) -> taint_types:taint_value().
 propagate_taints_for_models(Args) ->
     case [T || T <- Args, not is_no_taint(T)] of
         [] ->
@@ -1247,18 +1105,18 @@ propagate_taints_for_models(Args) ->
 setnth(1, [_ | Rest], New) -> [New | Rest];
 setnth(I, [E | Rest], New) -> [E | setnth(I - 1, Rest, New)].
 
-% This function forces the type into a taint_value() to make
+% This function forces the type into a taint_types:taint_value() to make
 % eqWAlizer happy
--spec taint_value(taint_value() | try_marker()) -> taint_value().
+-spec taint_value(taint_types:taint_value() | try_marker()) -> taint_types:taint_value().
 taint_value({try_enter, _}) -> error(bad_taint_value);
 taint_value(X) -> X.
 
--spec maybe_to_opaque_taint(taint_value()) -> taint_value().
+-spec maybe_to_opaque_taint(taint_types:taint_value()) -> taint_types:taint_value().
 maybe_to_opaque_taint({notaint, []}) -> {notaint, []};
 maybe_to_opaque_taint(Val) -> {taint, get_history(Val)}.
 
--spec model_of(models(), {atom(), atom(), integer()}, [taint_value()]) ->
-    taint_value() | notmodeled | get_process_dict | {put_process_dict, taint_value()}.
+-spec model_of(models(), {atom(), atom(), integer()}, [taint_types:taint_value()]) ->
+    taint_types:taint_value() | notmodeled | get_process_dict | {put_process_dict, taint_types:taint_value()}.
 model_of(_, {persistent_term, _, _}, _) -> {notaint, []};
 model_of(_, {supervisor, start_child, _}, _) -> {notaint, []};
 model_of(_, {operators, '+', 2}, Args) -> propagate_taints_for_models(Args);

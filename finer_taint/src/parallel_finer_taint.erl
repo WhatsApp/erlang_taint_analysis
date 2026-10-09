@@ -43,6 +43,6 @@ slf() ->
             TaintPid
     end.
 
--spec write_instruction(taint_abstract_machine:instruction()) -> ok.
+-spec write_instruction(taint_types:instruction()) -> ok.
 write_instruction(Instruction) ->
     abstract_machine_server:write_instruction(slf(), Instruction).

@@ -25,6 +25,6 @@
     write_instruction/1
 ]).
 
--spec write_instruction(taint_abstract_machine:instruction()) -> ok.
+-spec write_instruction(taint_types:instruction()) -> ok.
 write_instruction(Instruction) ->
     io:format("~0p.~n", [Instruction]).

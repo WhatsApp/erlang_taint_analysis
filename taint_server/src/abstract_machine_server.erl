@@ -42,12 +42,12 @@
 
 -type state() :: #abstract_machine_server_state{}.
 
--spec write_instruction(tid(), taint_abstract_machine:instruction()) -> ok.
+-spec write_instruction(tid(), taint_types:instruction()) -> ok.
 write_instruction(Tid, Instruction) ->
     gen_server:cast(tid_to_global_name(Tid), {write_instruction, Tid, Instruction}).
 
 % Mainly useful for testing, otherwise it is likely too expensive
--spec write_instruction_sync(tid(), taint_abstract_machine:instruction()) -> ok.
+-spec write_instruction_sync(tid(), taint_types:instruction()) -> ok.
 write_instruction_sync(Tid, Instruction) ->
     gen_server:call(tid_to_global_name(Tid), {write_instruction, Tid, Instruction}).
 
@@ -91,19 +91,19 @@ get_or_create_state_for_tid(
     end.
 
 -spec handle_call(
-    {write_instruction, tid(), taint_abstract_machine:instruction()}, gen_server:from(), state()
+    {write_instruction, tid(), taint_types:instruction()}, gen_server:from(), state()
 ) ->
     {reply, ok, state()} | {stop, normal, ok, state()}.
 handle_call({write_instruction, Tid, Instruction}, _From, State) ->
     {reply, ok, write_instruction(Tid, Instruction, State)}.
 
 -spec handle_cast(
-    {write_instruction, Tid :: tid(), Instruction :: taint_abstract_machine:instruction()}, state()
+    {write_instruction, Tid :: tid(), Instruction :: taint_types:instruction()}, state()
 ) -> {noreply, state()}.
 handle_cast({write_instruction, Tid, Instruction}, State) ->
     {noreply, write_instruction(Tid, Instruction, State)}.
 
--spec write_instruction(tid(), taint_abstract_machine:instruction(), state()) -> state().
+-spec write_instruction(tid(), taint_types:instruction(), state()) -> state().
 write_instruction(Tid, Instruction, State) ->
     {State1, TidState} = get_or_create_state_for_tid(Tid, State),
     ok = file:write(TidState, to_utf8(io_lib:format("~p.~n", [Instruction]))),

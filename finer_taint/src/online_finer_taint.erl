@@ -37,7 +37,7 @@ slf() ->
             TaintPid
     end.
 
--spec write_instruction(taint_abstract_machine:instruction()) -> ok.
+-spec write_instruction(taint_types:instruction()) -> ok.
 write_instruction(Instruction) ->
     case get(is_abs_proclet) of
         true -> error(recursive_call_in_finer_taint);

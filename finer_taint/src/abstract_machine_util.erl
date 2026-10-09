@@ -65,14 +65,14 @@ Contains functions that analyze the output of taint_abstract_machine
 }.
 % The n-th parameter of MFA
 -type mfan() :: {mfa(), non_neg_integer()}.
--type annotation_set() :: #{taint_abstract_machine:taint_history() => ok}.
+-type annotation_set() :: #{taint_types:taint_history() => ok}.
 -type annotated_lineage() :: #{{mfan(), mfan()} => annotation_set()}.
--type lineage_path() :: [taint_abstract_machine:taint_history_point() | {arg_leak, {mfa(), integer()}}].
+-type lineage_path() :: [taint_types:taint_history_point() | {arg_leak, {mfa(), integer()}}].
 
 % Url where files can be found
 -define(SOURCE_URL, "https//none.com/files/").
 
--spec history_to_leakeage_evidence(string(), taint_abstract_machine:taint_history()) -> leak_evidence().
+-spec history_to_leakeage_evidence(string(), taint_types:taint_history()) -> leak_evidence().
 history_to_leakeage_evidence(Sink, History) ->
     Source =
         case taint_abstract_machine:get_taint_sources(History, []) of
@@ -176,7 +176,7 @@ graphviz_leaks([Leak = {leak, Sink, _History} | Tail], Options) ->
     end,
     graphviz_leaks(Tail, Options).
 
--spec get_dataflows(taint_abstract_machine:taint_history()) -> taint_abstract_machine:dataflow_map().
+-spec get_dataflows(taint_types:taint_history()) -> taint_abstract_machine:dataflow_map().
 get_dataflows(History) ->
     Output = get_dataflows(History, [], [], #{}),
     Output.
@@ -184,9 +184,9 @@ get_dataflows(History) ->
 
 % Remove balanced call and return site
 -spec get_dataflows(
-    taint_abstract_machine:taint_history(),
-    taint_abstract_machine:taint_history(),
-    taint_abstract_machine:taint_history(),
+    taint_types:taint_history(),
+    taint_types:taint_history(),
+    taint_types:taint_history(),
     Dataflows
 ) -> Dataflows when Dataflows :: taint_abstract_machine:dataflow_map().
 get_dataflows(
@@ -221,11 +221,11 @@ get_dataflows([_H = {joined_history, _Type, Histories}], ReturnStack, Output, Ar
 get_dataflows([], _CallStack, _Output, ArgTaints) ->
     ArgTaints.
 
--spec get_covered_inst(taint_abstract_machine:taint_history()) -> map().
+-spec get_covered_inst(taint_types:taint_history()) -> map().
 get_covered_inst(History) ->
     get_covered_inst(History, #{}).
 
--spec get_covered_inst(taint_abstract_machine:taint_history(), map()) -> map().
+-spec get_covered_inst(taint_types:taint_history(), map()) -> map().
 get_covered_inst([{joined_history, _Type, Histories}], Output) ->
     HistoryOutputs = [get_covered_inst(Hist, #{}) || Hist <- Histories],
     lists:foldl(fun maps:merge/2, Output, HistoryOutputs);
@@ -239,7 +239,7 @@ get_covered_inst([], Output) ->
     Output.
 
 % Pretty print the annotations.
--spec annotations_impl(taint_abstract_machine:taint_history()) -> [string()].
+-spec annotations_impl(taint_types:taint_history()) -> [string()].
 annotations_impl([]) ->
     [];
 annotations_impl([{blackhole, _} | Tail]) ->
@@ -285,14 +285,14 @@ annotations(Map) when is_map(Map) ->
 % useful for connecting with any other edges and are therefore not
 % interesting and dropped by `filter_message_pass/1`
 
--spec filter_message_pass(taint_abstract_machine:taint_history()) -> taint_abstract_machine:taint_history().
+-spec filter_message_pass(taint_types:taint_history()) -> taint_types:taint_history().
 filter_message_pass(Input) ->
     filter_message_pass(Input, [], []).
 -spec filter_message_pass(
-    taint_abstract_machine:taint_history(),
-    taint_abstract_machine:taint_history(),
-    taint_abstract_machine:taint_history()
-) -> taint_abstract_machine:taint_history().
+    taint_types:taint_history(),
+    taint_types:taint_history(),
+    taint_types:taint_history()
+) -> taint_types:taint_history().
 filter_message_pass([{message_pass, _} | T], MaybeAfterFirstMessagePass, []) ->
     filter_message_pass(T, [], MaybeAfterFirstMessagePass);
 filter_message_pass([{message_pass, _} | T], _MaybeAfterFirstMessagePass, BeforeFirstMessagePass) ->
@@ -390,7 +390,7 @@ get_arg_lineage_impl([], Acc) ->
     Acc.
 
 -spec history_folder(erlang:mfa(), integer()) ->
-    fun((taint_abstract_machine:taint_history_point() | [taint_abstract_machine:taint_history()], Acc) -> Acc)
+    fun((taint_types:taint_history_point() | [taint_types:taint_history()], Acc) -> Acc)
 when
     Acc :: annotated_lineage().
 history_folder(ToMFA, ToArgN) ->
@@ -485,7 +485,7 @@ query_arg_lineage_impl([], Acc, _) ->
     Acc.
 
 % Traverses taint_history to find all the sources
--spec get_sources(taint_abstract_machine:taint_history()) -> [string()].
+-spec get_sources(taint_types:taint_history()) -> [string()].
 get_sources(History) ->
     lists:filtermap(
         fun
@@ -498,13 +498,13 @@ get_sources(History) ->
 %
 % Builds a graph representation of a Leak. Use to_dot/0 to print it in the DOT format.
 % This graph is not equivalent to a trace. Namely it can contain cycles.
--spec get_graph({leak, string(), taint_abstract_machine:taint_history()}) ->
+-spec get_graph({leak, string(), taint_types:taint_history()}) ->
     {nodes_ty(), edges_ty()}.
 get_graph({leak, Sink, History}) ->
     {Nodes, Edges} = get_graph_impl(Sink, History, {#{Sink => sink}, []}),
     {Nodes, lists:usort(Edges)}.
 
--spec get_graph_impl(string(), taint_abstract_machine:taint_history(), Acc) -> Acc when
+-spec get_graph_impl(string(), taint_types:taint_history(), Acc) -> Acc when
     Acc ::
         {nodes_ty(), edges_ty()}.
 get_graph_impl(To, [{source, From}], {AccNode, AccEdges}) ->
@@ -543,7 +543,7 @@ get_file_path(Node) ->
             X
     end.
 
--spec linearize_history(taint_abstract_machine:taint_history()) -> [taint_abstract_machine:taint_history()].
+-spec linearize_history(taint_types:taint_history()) -> [taint_types:taint_history()].
 linearize_history([]) ->
     [];
 linearize_history(X = [{tagged_source, _Tag, _Location}]) ->
@@ -560,7 +560,7 @@ linearize_history([Item | Tail]) when
 linearize_history([{joined_history, _, Histories}]) ->
     [X || H <- Histories, X <- linearize_history(H)].
 
--spec to_infer_bug_report(taint_abstract_machine:taint_history(), string()) -> infer_report().
+-spec to_infer_bug_report(taint_types:taint_history(), string()) -> infer_report().
 to_infer_bug_report(History, Sink) ->
     [{source, Source} | OtherSteps] = lists:reverse(History),
     {Filename, Line} =
@@ -594,7 +594,7 @@ to_infer_report([{leak, Sink, History} | Tail], Acc) ->
     BugReports = [to_infer_bug_report(Hist, Sink) || Hist <:- LinearHistories],
     to_infer_report(Tail, BugReports ++ Acc).
 
--spec to_infer_bug_trace(taint_abstract_machine:taint_history_point()) -> infer_bug_trace().
+-spec to_infer_bug_trace(taint_types:taint_history_point()) -> infer_bug_trace().
 to_infer_bug_trace({step, Location}) ->
     {Filename, Line} =
         case get_file_path(Location) of
