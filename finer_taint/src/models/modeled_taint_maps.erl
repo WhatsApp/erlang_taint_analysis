@@ -68,7 +68,7 @@
 %
 %
 
--spec get(term(), map(), term()) -> term().
+-spec get(Key, #{Key => Value}, Default) -> Value | Default.
 get(Key, Map, Default) ->
     try get(Key, Map) of
         Val -> Val
@@ -76,7 +76,7 @@ get(Key, Map, Default) ->
         error:{badmatch, _} -> Default
     end.
 
--spec get(term(), map()) -> term().
+-spec get(Key, #{Key => Value}) -> Value.
 get(Key, Map) ->
     #{Key := Value} = Map,
     Value.
@@ -100,7 +100,7 @@ find(Key, Map) ->
 put(Key, Value, Map) ->
     Map#{Key => Value}.
 
--spec take(term(), map()) -> {term(), map()} | error.
+-spec take(Key, #{Key => Value}) -> {Value, #{Key => Value}} | error.
 take(Key, Map) ->
     case get(Key, Map, error) of
         error ->
@@ -143,7 +143,7 @@ from_list_impl([{Key, Value} | Tail], Map) ->
 with(Ks, Map) ->
     with_impl(Ks, Map, #{}).
 
--spec with_impl(list(), map(), map()) -> map().
+-spec with_impl([K], map(), #{K => V}) -> #{K => V}.
 with_impl([], _Map, Acc) ->
     Acc;
 with_impl([Key | Tail], Map, Acc) ->
@@ -211,13 +211,13 @@ is_key(Key, Map) ->
 new() ->
     #{}.
 
--spec update_with(term(), fun((term()) -> term()), map()) -> map().
+-spec update_with(Key, fun((V1) -> V2), #{Key => V1}) -> #{Key => V1 | V2}.
 update_with(Key, Fun, Map) ->
     Val = ?MODULE:get(Key, Map),
     Map#{Key => Fun(Val)}.
 
--spec update_with(term(), fun((term()) -> term()), term(), map()) ->
-    map().
+-spec update_with(Key, fun((V1) -> V2), Init, #{Key => V1}) ->
+    #{Key => V1 | V2 | Init}.
 update_with(Key, Fun, Init, Map) ->
     case ?MODULE:get(Key, Map, notthere) of
         notthere -> Map#{Key => Init};
@@ -266,8 +266,8 @@ without(Ks, M) when is_list(Ks), is_map(M) ->
     lists:foldl(fun remove/2, M, Ks).
 
 % Relaxing the spec of filter so that it can be reused for filtermap
--spec filter(Pred, map()) -> map() when
-    Pred :: fun((term(), term()) -> boolean() | {true, term()}).
+-spec filter(Pred, #{K => V}) -> #{K => V | NewV} when
+    Pred :: fun((K, V) -> boolean() | {true, NewV}).
 filter(Pred, Map) ->
     fold(
         fun(K, V, Acc) ->
@@ -281,8 +281,8 @@ filter(Pred, Map) ->
         Map
     ).
 
--spec filtermap(Fun, map()) -> map() when
-    Fun :: fun((term(), term()) -> boolean() | {true, term()}).
+-spec filtermap(Fun, #{K => V}) -> #{K => V | NewV} when
+    Fun :: fun((K, V) -> boolean() | {true, NewV}).
 filtermap(Fun, Map) ->
     filter(Fun, Map).
 

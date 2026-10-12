@@ -1006,7 +1006,7 @@ intercepted_functions(Module, Func, #rewrite_state{renamed_modules = Renames}) w
 
 % If all types were exported this should be
 % split_to_next_qualifier(af_qualifier_seq(), [expr() | af_guard()]) -> {[expr()| af_guard()], af_qualifier_seq()}.
--spec split_to_next_qualifier([expr() | erl_parse:af_generator()], [expr() | dynamic()]) ->
+-spec split_to_next_qualifier([expr() | erl_parse:af_generator()], [[expr() | erl_parse:af_generator()]]) ->
     {dynamic(), [expr() | erl_parse:af_generator()]}.
 split_to_next_qualifier([], Filters) ->
     {lists:reverse(Filters), []};
