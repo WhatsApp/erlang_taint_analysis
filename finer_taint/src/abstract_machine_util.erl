@@ -68,6 +68,7 @@ Contains functions that analyze the output of taint_abstract_machine
 -type annotation_set() :: #{taint_types:taint_history() => ok}.
 -type annotated_lineage() :: #{{mfan(), mfan()} => annotation_set()}.
 -type lineage_path() :: [taint_types:taint_history_point() | {arg_leak, {mfa(), integer()}}].
+-type covered_insts() :: #{string() | taint_types:taint_history() | [taint_types:taint_history()] => ok}.
 
 % Url where files can be found
 -define(SOURCE_URL, "https//none.com/files/").
@@ -221,11 +222,11 @@ get_dataflows([_H = {joined_history, _Type, Histories}], ReturnStack, Output, Ar
 get_dataflows([], _CallStack, _Output, ArgTaints) ->
     ArgTaints.
 
--spec get_covered_inst(taint_types:taint_history()) -> map().
+-spec get_covered_inst(taint_types:taint_history()) -> covered_insts().
 get_covered_inst(History) ->
     get_covered_inst(History, #{}).
 
--spec get_covered_inst(taint_types:taint_history(), map()) -> map().
+-spec get_covered_inst(taint_types:taint_history(), covered_insts()) -> covered_insts().
 get_covered_inst([{joined_history, _Type, Histories}], Output) ->
     HistoryOutputs = [get_covered_inst(Hist, #{}) || Hist <- Histories],
     lists:foldl(fun maps:merge/2, Output, HistoryOutputs);
