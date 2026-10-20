@@ -377,7 +377,7 @@ lambdas(Config) ->
 
 calling_convention(Config) ->
     Leaks = compile_and_run_function(Config, function_calls, calling_convention_main),
-    ?assertEqual(1, length(Leaks)),
+    ?assertMatch([_], Leaks),
     [{leak, Sink, History}] = Leaks,
     ?assertEqual("function_calls.erl:26", Sink),
     ?assertEqual(
