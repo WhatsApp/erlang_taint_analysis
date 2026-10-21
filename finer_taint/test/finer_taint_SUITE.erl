@@ -458,16 +458,19 @@ recursion(Config) ->
         length(InsertAt_To_At_Lineage),
         "There are 6 times function_calls:insert_at/3-Arg2 flows to function_calls:at/2-Arg2 "
     ),
-    ?assertEqual(
+    ?assertMatch(
         [
-            {dataflow_src, {{function_calls, insert_at, 3}, 2}, [
-                {return_site, {function_calls, insert_at, 3}, "function_calls.erl:44"},
-                {call_site, {function_calls, at, 2}, "function_calls.erl:50"}
-            ]},
+            [
+                {dataflow_src, {{function_calls, insert_at, 3}, 2}, [
+                    {return_site, {function_calls, insert_at, 3}, "function_calls.erl:44"},
+                    {call_site, {function_calls, at, 2}, "function_calls.erl:50"}
+                ]},
 
-            {arg_leak, {{function_calls, at, 2}, 2}}
+                {arg_leak, {{function_calls, at, 2}, 2}}
+            ]
+            | _
         ],
-        lists:nth(1, lists:usort(InsertAt_To_At_Lineage))
+        lists:usort(InsertAt_To_At_Lineage)
     ).
 
 try_catch_define(Config) ->
