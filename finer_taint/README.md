@@ -13,7 +13,7 @@ that performs the actual emitting of instructions.
 The [taint\_abstract\_machine.erl](https://github.com/WhatsApp/erlang_taint_analysis/blob/main/finer_taint/src/taint_abstract_machine.erl)
 implements the abstract machine that executes the emitted instructions to produce analysis results.
 
-```
+```bash
 buck2 run :script
 ```
 
@@ -62,7 +62,7 @@ The abstract machine is a stack machine operating on taint values. It has a
 stack of taint values and a variable store associating variable names to taint
 values.
 
-```
+```text
 type taint_value(): notaint | {taint, history()}
 ```
 
@@ -89,7 +89,7 @@ The instrumentation is currently implemented as an AST transformation. The
 instrumentation inserts appropriate abstract machine instruction emitters in
 the program under test. Consider two simple assignments
 
-```
+```erlang
 AString = "123 is a good start of a string",
 PhoneNumber = finer_taint:source("123@secret.net"),
 ```
@@ -107,7 +107,7 @@ store the values directly. In the case of pattern matching we would need to
 emit additional instructions,  but that’s outside the scope of this note. The
 final instrumented snippet looks like:
 
-```
+```erlang
 push(notaint),
 AString = "123 is a good start of a string",
 store("AString"),
@@ -125,7 +125,7 @@ Finally we emit the `apply(string:slice/3)` after the actual function call
 returns. Finally we store the result into `X`.
 
 
-```
+```erlang
 push(notaint),
 push(notaint),
 get("PhoneNumber"),
@@ -150,7 +150,7 @@ function is on top of the stack.
 
 Consider we have instrumented and ran the following program:
 
-```
+```erlang
 AString = "123 is ...",
 Number = source("123@..."),
 X = slice(Number, 0, 3),
@@ -164,7 +164,7 @@ are shown as comments (prefixed with `%`). The comments at the right side of
 the emitted instructions represent the state of the abstract machine after
 executing that instruction.
 
-```
+```text
 % AString = "123 is ...",
 push(notaint), % [notaint], {}
 store("AString"), % [], {AString: notaint}
@@ -232,7 +232,7 @@ cases, but it's a work in progress so please add them here if you find any not m
 
 Finer taint analysis does not consider control flow based data flows. For example in
 
-```
+```erlang
 is_member(PII, [PII | _] ) ->
   true;
 is_member(PII, [_, Tail]) ->

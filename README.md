@@ -19,7 +19,7 @@ Please [install Buck2](https://github.com/facebook/buck2?tab=readme-ov-file#inst
 
 ### Run the simple example
 
-```
+```bash
 $ buck2 run @//mode/online_finer_taint :examples  simple
 ...
 Done gathering
@@ -42,7 +42,7 @@ We provide two ways of running the examples:
 
 To run the more complicated gen_server_example in the online mode, try:
 
-```
+```bash
 $ buck2 run @mode/online_finer_taint :examples some_string
 ...
 {leak,"example_gen_server.erl:41",
@@ -55,7 +55,7 @@ $ buck2 run @mode/online_finer_taint :examples some_string
 To run the simple example in the second mode, run the commands below. This might be useful should you want to manually
 inspect the instructions for the abstract machine.
 
-```
+```bash
 # Clean up files that might be left over from previous runs
 rm /tmp/default_instr_prefix-*
 
@@ -83,7 +83,7 @@ Another way to try the analysis works is by running the test suite and inspectin
 
 For example:
 
-```
+```bash
 buck2 test :finer_taint_SUITE
 ```
 
