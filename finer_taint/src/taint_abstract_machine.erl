@@ -1021,7 +1021,8 @@ bit_pattern_take_value([{Size, [binary]} | PatternTail], [HeadByteTaintValue | T
     bit_pattern_take_value([{NewSize, [binary]} | PatternTail], Tail, [NewCurrentTaintValue | Others]).
 
 % This function crashes if the list doesn't contain only taint values
--spec is_all_taint_value([taint_types:taint_value() | try_marker() | map()]) -> [taint_types:taint_value()].
+-spec is_all_taint_value([taint_types:taint_value() | try_marker() | #{term() => taint_types:taint_value()}]) ->
+    [taint_types:taint_value()].
 is_all_taint_value([H = {lambda_closure, _} | T]) ->
     [H | is_all_taint_value(T)];
 is_all_taint_value([H = {notaint, _} | T]) ->

@@ -143,7 +143,7 @@ from_list_impl([{Key, Value} | Tail], Map) ->
 with(Ks, Map) ->
     with_impl(Ks, Map, #{}).
 
--spec with_impl([K], map(), #{K => V}) -> #{K => V}.
+-spec with_impl([K], #{term() => V}, #{K => V}) -> #{K => V}.
 with_impl([], _Map, Acc) ->
     Acc;
 with_impl([Key | Tail], Map, Acc) ->
