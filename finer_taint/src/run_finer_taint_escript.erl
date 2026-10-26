@@ -177,7 +177,7 @@ remove_recursive_loops([]) ->
 remove_recursive_loops([H | T]) ->
     [H | remove_recursive_loops(T)].
 
--spec flamegraph(list(), list(), T) -> T when T :: #{stack() => integer()}.
+-spec flamegraph([taint_types:instruction()], list(), T) -> T when T :: #{stack() => integer()}.
 flamegraph([], [], State) ->
     io:format("Done on one file\n"),
     State;
