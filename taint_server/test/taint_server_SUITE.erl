@@ -91,6 +91,7 @@ can_roundtrip_instruction_with_high_codepoints(Config) ->
         file:consult(AbstrInstructionPrefix ++ "-" ++ integer_to_list(Tid))
     ).
 
+-spec done() -> ok.
 done() ->
     receive
         done -> ok
