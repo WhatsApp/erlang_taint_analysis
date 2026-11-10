@@ -109,7 +109,7 @@ elemnt(3, {_A1, _A2, A3, _A4, _A5, _A6, _A7, _A8, _A9}) ->
 elemnt(Index, Tuple) ->
     lists:nth(Index, tuple_to_list(Tuple)).
 
--spec mapply(fun(), list()) -> term().
+-spec mapply(fun((...) -> T), list()) -> T.
 mapply(F, []) ->
     F();
 mapply(F, [Arg1]) ->
