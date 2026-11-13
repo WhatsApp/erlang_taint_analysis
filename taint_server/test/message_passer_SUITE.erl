@@ -24,8 +24,6 @@ Tests for taint message_passer
     all/0,
     suite/0,
     init_per_testcase/2,
-    init_per_suite/1,
-    end_per_suite/1,
     end_per_testcase/2,
     groups/0
 ]).
@@ -66,12 +64,6 @@ init_per_testcase(_TestCase, Config) ->
 
 end_per_testcase(_TestCase, _Config) ->
     taint_message_passer:uninit(),
-    ok.
-
-init_per_suite(Config) ->
-    Config.
-
-end_per_suite(_Config) ->
     ok.
 
 %%--------------------------------------------------------------------

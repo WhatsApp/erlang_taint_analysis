@@ -23,8 +23,6 @@ Tests abstract_machine_proclet
 -export([
     suite/0,
     all/0,
-    init_per_suite/1,
-    end_per_suite/1,
     groups/0
 ]).
 
@@ -50,10 +48,6 @@ suite() ->
 all() ->
     [{group, basic}].
 
-init_per_suite(Config) ->
-    Config.
-end_per_suite(_Config) ->
-    ok.
 %%--------------------------------------------------------------------
 %% TEST CASES
 

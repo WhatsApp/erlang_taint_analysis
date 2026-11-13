@@ -29,8 +29,7 @@ parallel_finer_taint instead pf ct_finer_taint
     groups/0,
     init_per_suite/1,
     end_per_suite/1,
-    init_per_testcase/2,
-    end_per_testcase/2
+    init_per_testcase/2
 ]).
 
 %% Test cases
@@ -98,9 +97,6 @@ init_per_testcase(TestCase, Config) ->
     application:set_env(taint_server, instructions_stream_prefix, FileName),
     UpdatedConfig = wa_test_init:ensure_all_started(Config, taint_server),
     [{analysis_instr, FileName} | UpdatedConfig].
-
-end_per_testcase(_TestCase, _Config) ->
-    ok.
 
 compile(Modules, Config) ->
     DataDir = proplists:get_value(data_dir, Config),
