@@ -62,6 +62,7 @@ runs_some_instructions(_Config) ->
     gen_server:stop(GathererPid),
     ?assertEqual(#{{leak, "some_sink.erl:12", [{source, "some_source.erl:12"}]} => ok}, Leaks).
 
+-spec done() -> ok.
 done() ->
     receive
         done -> ok

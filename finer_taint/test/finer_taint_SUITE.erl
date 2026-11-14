@@ -157,6 +157,9 @@ compile(Modules, Config) ->
     end,
     [CompileMod(Elem) || Elem <:- Modules] ++ Config.
 
+-spec compile_and_load(Config, Module) -> {module, module()} when
+    Config :: ct_suite:ct_config(),
+    Module :: module().
 compile_and_load(Config, Module) ->
     [{_, Forms} | _] = compile([Module], Config),
     io:format("~p Forms: ~p~n", [Module, Forms]),
@@ -175,6 +178,10 @@ compile_and_load(Config, Module) ->
     ok = file:write_file(BeamPath, Binary),
     {module, Module} = code:load_binary(Module, BeamPath, Binary).
 
+-spec compile_and_run_function(Config, Module, Func) -> taint_abstract_machine:leaks() when
+    Config :: ct_suite:ct_config(),
+    Module :: module(),
+    Func :: atom().
 compile_and_run_function(Config, Module, Func) ->
     compile_and_load(Config, Module),
     {_Ret, OutputRaw} = capture_out:capture_output(fun() -> Module:Func() end),
@@ -205,6 +212,9 @@ compile_and_run_function(Config, Module, Func) ->
 
 % Compares live instruction stream with the one in fixture
 % accounting for differences due to OTP versions
+-spec assert_instruction_stream_equal(Expected, Actual) -> ok when
+    Expected :: iodata(),
+    Actual :: iodata().
 assert_instruction_stream_equal(Expected, Actual) ->
     Replace = fun(Instructions) ->
         % GenLc<Suffix> variable names depend on a hash of a subexpression AST,
@@ -217,6 +227,9 @@ get_instr_fixture_filename(Config, Func) ->
     DataDir = proplists:get_value(data_dir, Config),
     filename:join(DataDir, io_lib:format("~p_analysis_instr", [Func])).
 
+-spec run_lineage_analysis(Config, Func) -> taint_abstract_machine:leaks() when
+    Config :: ct_suite:ct_config(),
+    Func :: atom().
 run_lineage_analysis(Config, Func) ->
     FixtureFilename = get_instr_fixture_filename(Config, Func),
     FullLineage = parallel_abstract_machine:run_lineage_with_line_history([FixtureFilename]),
@@ -658,6 +671,9 @@ shortcircuiting(Config) ->
     F = fun({_, _, Hist}) -> ?assertEqual(["shortcircuiting.erl:25"], abstract_machine_util:get_sources(Hist)) end,
     lists:foreach(F, Leaks).
 
+-spec test_comprehension(Comprehension, CompareWith) -> ok when
+    Comprehension :: string(),
+    CompareWith :: nocompare | print | map | map_c | string().
 test_comprehension(Comprehension, CompareWith) ->
     {ok, Tokens, _} = erl_scan:string(Comprehension),
     {ok, [Forms]} = erl_parse:parse_exprs(Tokens),

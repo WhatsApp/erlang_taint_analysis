@@ -110,6 +110,8 @@ compile(Modules, Config) ->
     end,
     [CompileMod(Elem) || Elem <:- Modules] ++ Config.
 
+-spec replace_undeterministic(Binary) -> iodata() | unicode:charlist() when
+    Binary :: binary().
 replace_undeterministic(Binary) ->
     Opts = [{return, binary}, global],
     Binary0 = re:replace(
@@ -124,6 +126,10 @@ replace_undeterministic(Binary) ->
     ),
     Binary3.
 
+-spec compile_and_run_function(Config, Module, Func) -> taint_abstract_machine:leaks() when
+    Config :: ct_suite:ct_config(),
+    Module :: module(),
+    Func :: atom().
 compile_and_run_function(Config, Module, Func) ->
     [{_, Forms} | _] = compile([Module], Config),
     io:format("~p Forms: ~p~n", [Module, Forms]),
