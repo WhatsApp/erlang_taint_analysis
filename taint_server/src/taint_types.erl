@@ -129,7 +129,7 @@ Instructions emitted by code instrumented with finer_taint_compiler, as stored b
     % Cons is always just a head and a tail
     | {cons}.
 
--type try_block_id() :: {module(), integer()}.
+-type try_block_id() :: {module(), non_neg_integer(), non_neg_integer()}.
 
 -type try_catch_state() ::
     % Indicates try block entry. That is exceptions

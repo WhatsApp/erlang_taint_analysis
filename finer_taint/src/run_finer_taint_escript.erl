@@ -24,7 +24,7 @@
 %% Escript that runs the finer taint abstract machine and
 %% produces usable outputs
 %%====================================================================
--type stack() :: [mfa()].
+-type stack() :: [mfa() | taint_types:try_block_id()].
 
 %% escript Entry point
 -spec main([string()]) -> ok.
@@ -177,7 +177,7 @@ remove_recursive_loops([]) ->
 remove_recursive_loops([H | T]) ->
     [H | remove_recursive_loops(T)].
 
--spec flamegraph([taint_types:instruction()], list(), T) -> T when T :: #{stack() => integer()}.
+-spec flamegraph([taint_types:instruction()], stack(), T) -> T when T :: #{stack() => integer()}.
 flamegraph([], [], State) ->
     io:format("Done on one file\n"),
     State;
