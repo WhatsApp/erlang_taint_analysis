@@ -706,6 +706,8 @@ comprehension_transform(_Config) ->
         "        GenLc5ENHDPWZ(GenlcTail5ENHDPWZ)\n"
         "end([1, 2, 3])",
     test_comprehension("[X || X <- [1,2,3]].", BasicComprehensionExpected),
+    test_comprehension("[X, -X || X <- [1,2,3], X > 1].", nocompare),
+    test_comprehension("[{X,Y}, {Y,X} || X <:- [1,2], Y <:- [a,b]].", nocompare),
     test_comprehension("[{X, Y} || X <- [1,2,3], Y <- [a,b,c]].", nocompare),
     test_comprehension("[{X, Y} || X <- [1,2,3], {a,Y} <- [{a,1},b,c]].", print),
     test_comprehension("[Y || {X1, Y} <- [{1,2}, {1,3}, {2,2}], 1 == X1, _ <- [1,2]].", print),

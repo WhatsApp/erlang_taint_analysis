@@ -1034,8 +1034,11 @@ split_to_next_qualifier(Rest = [Head | Tail], Filters) ->
             end
     end.
 
--spec rewrite_qualifier([expr() | erl_parse:af_generator()], erl_parse:abstract_expr(), [expr()]) -> expr().
-rewrite_qualifier([], Body, [RecursiveCall]) ->
+-spec rewrite_qualifier([expr() | erl_parse:af_generator()], expr() | [expr()], [expr()]) -> expr().
+rewrite_qualifier([], Bodies, [RecursiveCall]) when is_list(Bodies) ->
+    Anno = element(2, RecursiveCall),
+    lists:foldr(fun(Body, Tail) -> {cons, Anno, Body, Tail} end, RecursiveCall, Bodies);
+rewrite_qualifier([], Body, [RecursiveCall]) when is_tuple(Body) ->
     Anno = element(2, RecursiveCall),
     {cons, Anno, Body, RecursiveCall};
 rewrite_qualifier([{GenType, Anno, Pattern, ListExpr} | Tail0], Body, EmptyClauseBody) when
@@ -1101,7 +1104,6 @@ rewrite_qualifier([{BGenType, Anno, Pattern, BinaryExpr} | Tail0], Body, EmptyCl
             b_generate -> [MainClause, FallbackClause, EmptyClause]
         end,
     {call, Anno, {named_fun, Anno, BinGenLc, Clauses}, [BinaryExpr]};
-% eqwalizer:fixme type fix not yet in release https://github.com/erlang/otp/pull/10040
 rewrite_qualifier([{zip, Anno, Generators} | Tail0], Body, EmptyClauseBody) ->
     {Patterns, ListExprs} = lists:unzip([
         case Gen of
@@ -1132,12 +1134,18 @@ rewrite_qualifier([{zip, Anno, Generators} | Tail0], Body, EmptyClauseBody) ->
                 {call, Anno, {remote, Anno, ?ATOM(lists), ?ATOM(zip)}, [ListOfLists]}
         end,
     rewrite_qualifier([{generate_strict, Anno, TuplePattern, ZippedExpr} | Tail0], Body, EmptyClauseBody);
-rewrite_qualifier([BoolExpr | Tail], Body, EmptyClauseBody) ->
+rewrite_qualifier([BoolExpr | Tail], Body, EmptyClauseBody) when
+    element(1, BoolExpr) =/= generate,
+    element(1, BoolExpr) =/= generate_strict,
+    element(1, BoolExpr) =/= b_generate,
+    element(1, BoolExpr) =/= b_generate_strict,
+    element(1, BoolExpr) =/= m_generate,
+    element(1, BoolExpr) =/= m_generate_strict,
+    element(1, BoolExpr) =/= zip
+->
     Anno = element(2, lists:nth(1, EmptyClauseBody)),
     TrueClause = {clause, Anno, [?ATOM(true)], [], [rewrite_qualifier(Tail, Body, EmptyClauseBody)]},
     FalseClause = {clause, Anno, [?ATOM(false)], [], EmptyClauseBody},
-    % Eqwalizer cannot figure out BoolExpr is just expr() and not af_generator()
-    % eqwalizer:ignore This should be cast_dynamic, but can't import eqwalizer module here because parse transform
     {'case', Anno, BoolExpr, [TrueClause, FalseClause]}.
 
 % Reverse engineered from core erlang transforms
