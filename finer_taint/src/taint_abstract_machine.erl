@@ -924,14 +924,14 @@ propagate(
         stack = [{notaint, []} || _ <- lists:seq(1, Arity)] ++ Stack
     };
 propagate(
-    {push_scope, {MFA = {Module, _Function, Arity}, _Loc}},
+    {push_scope, {MFA = {Module, _Function, Arity}, Loc}},
     State = #taint_am_state{
         stack = Stack,
         scopes = Scope,
         lineage_modules_denymap = LineageModulesDenyMap
     }
 ) ->
-    ?LOG_INFO("Setting up new stack at ~p~n", [_Loc]),
+    ?LOG_INFO("Setting up new stack at ~p~n", [Loc]),
     StartingStack =
         case State#taint_am_state.lineage_mode of
             false -> [{notaint, []} || _ <- lists:seq(1, Arity)];
